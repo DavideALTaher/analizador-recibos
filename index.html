@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analizador de Recibos Eléctricos</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/dropzone@5/dist/min/dropzone.min.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/dropzone@5/dist/min/dropzone.min.css" type="text/css" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <div class="container mx-auto px-4 py-8">
+        <header class="text-center mb-8">
+            <h1 class="text-3xl font-bold text-blue-800">Analizador de Recibos Eléctricos</h1>
+            <p class="text-gray-600">Arrastre y suelte sus recibos para determinar el equipo de ahorro ideal</p>
+        </header>
+
+        <div id="upload-section" class="bg-white rounded-lg shadow-lg p-6 mb-8">
+            <h2 class="text-xl font-bold mb-4 text-gray-800">Subir Recibos Eléctricos</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <div id="dropzone" class="dropzone h-60 flex items-center justify-center border-2 border-dashed border-blue-500 rounded-lg bg-blue-50">
+                        <div class="dz-message text-center">
+                            <div class="text-lg mb-2 text-blue-600">Arrastre sus recibos eléctricos aquí</div>
+                            <div class="text-sm text-gray-500">O haga clic para seleccionar archivos</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="flex justify-end mt-6">
+                <button id="analyze-btn" class="bg-blue-600 hover:bg-blue-700 text-white py-2 px-6 rounded font-bold">
+                    Analizar Recibos
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('analyze-btn').addEventListener('click', function() {
+            alert('Función de análisis simulada. En una implementación real, se procesarían los recibos.');
+        });
+    </script>
+</body>
+</html>
