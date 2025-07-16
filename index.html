@@ -14,7 +14,6 @@
     <!-- jsPDF para exportar a PDF -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
-    
     <!-- SheetJS para exportar a Excel -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <style>
@@ -39,7 +38,57 @@
             <p class="text-gray-600">Arrastre y suelte sus recibos para determinar el equipo de ahorro ideal</p>
         </header>
 
-        <div id="upload-section" class="bg-white rounded-lg shadow-lg p-6 mb-8">
+        <!-- Selector de análisis previos -->
+        <div id="history-section" class="bg-white rounded-lg shadow-lg p-6 mb-8">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-xl font-bold text-gray-800">Análisis</h2>
+                <div>
+                    <button id="new-analysis-btn" class="bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded font-medium">
+                        + Nuevo Análisis
+                    </button>
+                </div>
+            </div>
+            
+            <div id="analysis-list" class="border rounded-lg overflow-hidden">
+                <div class="bg-gray-100 p-3 border-b">
+                    <div class="grid grid-cols-12 gap-2 font-medium text-gray-700">
+                        <div class="col-span-3">Cliente</div>
+                        <div class="col-span-2">Fecha</div>
+                        <div class="col-span-2">Recibos</div>
+                        <div class="col-span-2">Modelo Recomendado</div>
+                        <div class="col-span-3">Acciones</div>
+                    </div>
+                </div>
+                <div id="analysis-items" class="divide-y">
+                    <div class="p-3 text-center text-gray-500 italic">
+                        No hay análisis guardados
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sección de entrada de datos -->
+        <div id="upload-section" class="bg-white rounded-lg shadow-lg p-6 mb-8 hidden">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-xl font-bold text-gray-800">Datos del Cliente</h2>
+                <button id="back-to-history-btn" class="text-blue-600 hover:text-blue-800">
+                    ← Volver al historial
+                </button>
+            </div>
+            
+            <div class="mb-8 border-b pb-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Nombre del Cliente*</label>
+                        <input type="text" id="client-name" class="w-full p-2 border border-gray-300 rounded" placeholder="Ej. Empresa ABC" required>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Fecha del Análisis</label>
+                        <input type="date" id="analysis-date" class="w-full p-2 border border-gray-300 rounded" readonly>
+                    </div>
+                </div>
+            </div>
+            
             <h2 class="text-xl font-bold mb-4 text-gray-800">Subir Recibos Eléctricos</h2>
             
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -81,29 +130,46 @@
                 
                 <div id="manual-receipts">
                     <div class="receipt-entry mb-4 p-4 border border-gray-200 rounded-lg">
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Proveedor de Electricidad*</label>
+                                <input type="text" class="receipt-provider w-full p-2 border border-gray-300 rounded" placeholder="Ej. ICE" required>
+                            </div>
+                            
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Número de Recibo*</label>
+                                <input type="text" class="receipt-number w-full p-2 border border-gray-300 rounded" placeholder="Ej. 12345678" required>
+                            </div>
+                            
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Fecha de Emisión*</label>
+                                <input type="date" class="receipt-date w-full p-2 border border-gray-300 rounded" required>
+                            </div>
+                        </div>
+                        
                         <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
                             <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1">Mes</label>
-                                <input type="month" class="receipt-month w-full p-2 border border-gray-300 rounded">
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Mes de Facturación*</label>
+                                <input type="month" class="receipt-month w-full p-2 border border-gray-300 rounded" required>
                             </div>
                             
                             <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1">Consumo (kWh)</label>
-                                <input type="number" class="receipt-consumption w-full p-2 border border-gray-300 rounded" placeholder="Ej. 3000">
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Consumo (kWh)*</label>
+                                <input type="number" class="receipt-consumption w-full p-2 border border-gray-300 rounded" placeholder="Ej. 3000" required>
                             </div>
                             
                             <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1">Demanda (kW)</label>
-                                <input type="number" class="receipt-demand w-full p-2 border border-gray-300 rounded" placeholder="Ej. 15">
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Demanda (kW)*</label>
+                                <input type="number" class="receipt-demand w-full p-2 border border-gray-300 rounded" placeholder="Ej. 15" required>
                             </div>
                             
                             <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1">Factor de Potencia</label>
-                                <input type="number" step="0.01" min="0" max="1" class="receipt-factor w-full p-2 border border-gray-300 rounded" placeholder="Ej. 0.85">
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Factor de Potencia*</label>
+                                <input type="number" step="0.01" min="0" max="1" class="receipt-factor w-full p-2 border border-gray-300 rounded" placeholder="Ej. 0.85" required>
                             </div>
                             
                             <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1">Monto Total (₡)</label>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Monto Total (₡)*</label>
                                 <input type="number" class="receipt-amount w-full p-2 border border-gray-300 rounded" placeholder="Ej. 150000" required>
                             </div>
                         </div>
@@ -123,14 +189,36 @@
                 </div>
             </div>
             
-            <div class="flex justify-end mt-6">
+            <div class="flex justify-end mt-6 space-x-2">
+                <button id="save-data-btn" class="bg-gray-600 hover:bg-gray-700 text-white py-2 px-6 rounded">
+                    Guardar Datos
+                </button>
                 <button id="analyze-btn" class="bg-blue-600 hover:bg-blue-700 text-white py-2 px-6 rounded font-bold">
                     Analizar Recibos
                 </button>
             </div>
         </div>
         
+        <!-- Sección de resultados -->
         <div id="results-section" class="hidden">
+            <div class="bg-white rounded-lg shadow-lg p-6 mb-8">
+                <div class="flex justify-between items-center mb-4">
+                    <div>
+                        <h2 class="text-xl font-bold text-gray-800">
+                            Resultados para: <span id="results-client-name" class="text-blue-800">-</span>
+                        </h2>
+                        <p class="text-sm text-gray-500">
+                            Fecha del análisis: <span id="results-date">-</span>
+                        </p>
+                    </div>
+                    <div class="flex space-x-2">
+                        <button id="edit-data-btn" class="text-blue-600 hover:text-blue-800">
+                            ← Volver a editar datos
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
             <!-- Los resultados del análisis se mostrarán aquí -->
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
                 <div class="bg-white rounded-lg shadow-lg p-6">
@@ -272,16 +360,38 @@
                 </div>
                 
                 <div class="col-span-1 lg:col-span-2 text-center mt-6">
-                    <button id="back-btn" class="bg-gray-600 hover:bg-gray-700 text-white py-2 px-6 rounded">
-                        Volver a Ingresar Datos
+                    <div class="flex flex-wrap justify-center gap-4">
+                        <button id="back-btn" class="bg-gray-600 hover:bg-gray-700 text-white py-2 px-6 rounded">
+                            Editar Datos
+                        </button>
+                        
+                        <button id="export-pdf-btn" class="bg-green-600 hover:bg-green-700 text-white py-2 px-6 rounded">
+                            Exportar a PDF
+                        </button>
+                        
+                        <button id="export-excel-btn" class="bg-blue-600 hover:bg-blue-700 text-white py-2 px-6 rounded">
+                            Exportar a Excel
+                        </button>
+                        
+                        <button id="finish-analysis-btn" class="bg-purple-600 hover:bg-purple-700 text-white py-2 px-6 rounded">
+                            Finalizar Análisis
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Modal para confirmar finalización del análisis -->
+        <div id="finish-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+            <div class="bg-white rounded-lg p-6 max-w-md w-full">
+                <h3 class="text-xl font-bold mb-4">Finalizar Análisis</h3>
+                <p class="mb-6">¿Desea guardar este análisis y volver al inicio?</p>
+                <div class="flex justify-end space-x-2">
+                    <button id="cancel-finish-btn" class="px-4 py-2 border border-gray-300 rounded hover:bg-gray-100">
+                        Cancelar
                     </button>
-                    
-                    <button id="export-pdf-btn" class="bg-green-600 hover:bg-green-700 text-white py-2 px-6 rounded ml-4">
-                        Exportar a PDF
-                    </button>
-
-                    <button id="export-excel-btn" class="bg-blue-600 hover:bg-blue-700 text-white py-2 px-6 rounded ml-4">
-                        Exportar a Excel
+                    <button id="confirm-finish-btn" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
+                        Guardar y Finalizar
                     </button>
                 </div>
             </div>
@@ -338,21 +448,182 @@
             }
         ];
 
-        // Variable global para Dropzone
+        // Variables globales
         let myDropzone;
+        let currentAnalysis = null;
+        let savedAnalyses = [];
+
+        // Función para cargar análisis guardados
+        function loadSavedAnalyses() {
+            const saved = localStorage.getItem('savedAnalyses');
+            if (saved) {
+                try {
+                    savedAnalyses = JSON.parse(saved);
+                    updateAnalysisList();
+                } catch (e) {
+                    console.error('Error cargando análisis guardados:', e);
+                    savedAnalyses = [];
+                }
+            }
+        }
+
+        // Función para guardar análisis
+        function saveAnalyses() {
+            try {
+                localStorage.setItem('savedAnalyses', JSON.stringify(savedAnalyses));
+            } catch (e) {
+                console.error('Error guardando análisis:', e);
+                alert('Error al guardar los análisis. Es posible que el almacenamiento local esté lleno o no disponible.');
+            }
+        }
+
+        // Función para actualizar la lista de análisis
+        function updateAnalysisList() {
+            const analysisList = document.getElementById('analysis-items');
+            
+            if (savedAnalyses.length === 0) {
+                analysisList.innerHTML = `
+                    <div class="p-3 text-center text-gray-500 italic">
+                        No hay análisis guardados
+                    </div>
+                `;
+                return;
+            }
+            
+            analysisList.innerHTML = '';
+            savedAnalyses.forEach((analysis, index) => {
+                const date = new Date(analysis.date);
+                const formattedDate = date.toLocaleDateString();
+                
+                const item = document.createElement('div');
+                item.className = 'p-3 hover:bg-gray-50';
+                item.innerHTML = `
+                    <div class="grid grid-cols-12 gap-2">
+                        <div class="col-span-3 font-medium">${analysis.clientName}</div>
+                        <div class="col-span-2">${formattedDate}</div>
+                        <div class="col-span-2">${analysis.receipts.length}</div>
+                        <div class="col-span-2">${analysis.results?.modeloRecomendado || '-'}</div>
+                        <div class="col-span-3 flex space-x-2">
+                            <button class="view-analysis text-blue-600 hover:text-blue-800" data-index="${index}">
+                                Ver
+                            </button>
+                            <button class="export-pdf text-green-600 hover:text-green-800" data-index="${index}">
+                                PDF
+                            </button>
+                            <button class="export-excel text-indigo-600 hover:text-indigo-800" data-index="${index}">
+                                Excel
+                            </button>
+                            <button class="delete-analysis text-red-600 hover:text-red-800" data-index="${index}">
+                                Eliminar
+                            </button>
+                        </div>
+                    </div>
+                `;
+                analysisList.appendChild(item);
+            });
+            
+            // Agregar eventos a los botones
+            document.querySelectorAll('.view-analysis').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const index = parseInt(this.getAttribute('data-index'));
+                    loadAnalysis(index);
+                });
+            });
+            
+            document.querySelectorAll('.export-pdf').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const index = parseInt(this.getAttribute('data-index'));
+                    exportPDF(savedAnalyses[index]);
+                });
+            });
+            
+            document.querySelectorAll('.export-excel').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const index = parseInt(this.getAttribute('data-index'));
+                    exportExcel(savedAnalyses[index]);
+                });
+            });
+            
+            document.querySelectorAll('.delete-analysis').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const index = parseInt(this.getAttribute('data-index'));
+                    if (confirm(`¿Está seguro de eliminar el análisis de ${savedAnalyses[index].clientName}?`)) {
+                        savedAnalyses.splice(index, 1);
+                        saveAnalyses();
+                        updateAnalysisList();
+                    }
+                });
+            });
+        }
+
+        // Función para cargar un análisis
+        function loadAnalysis(index) {
+            currentAnalysis = savedAnalyses[index];
+            
+            // Actualizar campos del cliente
+            document.getElementById('client-name').value = currentAnalysis.clientName;
+            document.getElementById('analysis-date').value = currentAnalysis.date;
+            
+            // Mostrar sección de resultados si hay resultados
+            if (currentAnalysis.results) {
+                document.getElementById('results-client-name').textContent = currentAnalysis.clientName;
+                document.getElementById('results-date').textContent = new Date(currentAnalysis.date).toLocaleDateString();
+                
+                displayResults(currentAnalysis.results);
+                
+                document.getElementById('history-section').classList.add('hidden');
+                document.getElementById('upload-section').classList.add('hidden');
+                document.getElementById('results-section').classList.remove('hidden');
+            } else {
+                // Si no hay resultados, mostrar sección de carga
+                document.getElementById('history-section').classList.add('hidden');
+                document.getElementById('upload-section').classList.remove('hidden');
+                document.getElementById('results-section').classList.add('hidden');
+                
+                // Aquí deberíamos cargar los recibos previamente guardados
+                // Pero como es una simulación, simplemente mostramos la interfaz
+            }
+        }
+
+        // Función para crear un nuevo análisis
+        function createNewAnalysis() {
+            currentAnalysis = {
+                id: Date.now().toString(),
+                date: new Date().toISOString().split('T')[0],
+                clientName: '',
+                receipts: [],
+                results: null
+            };
+            
+            // Limpiar campos
+            document.getElementById('client-name').value = '';
+            document.getElementById('analysis-date').value = currentAnalysis.date;
+            
+            // Resetear Dropzone
+            if (myDropzone) {
+                myDropzone.removeAllFiles();
+            }
+            
+            // Actualizar lista de recibos
+            updateReceiptList();
+            
+            // Mostrar sección de carga
+            document.getElementById('history-section').classList.add('hidden');
+            document.getElementById('upload-section').classList.remove('hidden');
+            document.getElementById('results-section').classList.add('hidden');
+        }
 
         // Función para actualizar la lista de recibos
         function updateReceiptList() {
             const receiptList = document.getElementById('receipt-list');
-            const files = myDropzone.files;
             
-            if (files.length === 0) {
+            if (!myDropzone || myDropzone.files.length === 0) {
                 receiptList.innerHTML = '<div class="text-gray-500 italic">No hay recibos cargados</div>';
                 return;
             }
             
             receiptList.innerHTML = '';
-            files.forEach((file, index) => {
+            myDropzone.files.forEach((file, index) => {
                 const item = document.createElement('div');
                 item.className = 'flex items-center justify-between py-2 px-3 bg-blue-50 rounded';
                 item.innerHTML = `
@@ -380,13 +651,16 @@
 
         // Función para obtener datos de recibos (combina archivos y manual)
         function getReceiptData() {
+            if (!currentAnalysis) {
+                return [];
+            }
+            
             const receipts = [];
             
             // Para esta demo, simulamos datos de recibos basados en los archivos cargados
             // En una implementación real, se extraerían datos mediante OCR o API
-            if (myDropzone && myDropzone.files) {
-                const files = myDropzone.files;
-                files.forEach(file => {
+            if (myDropzone && myDropzone.files.length > 0) {
+                myDropzone.files.forEach(file => {
                     // Simular datos de consumo basados en el tamaño del archivo
                     // (en una app real, esto sería reemplazado por OCR o procesamiento de datos)
                     const consumo = Math.floor(Math.random() * 5000) + 1000;
@@ -395,6 +669,9 @@
                     const monto = consumo * 100 + demanda * 2000;
                     
                     receipts.push({
+                        proveedor: 'ICE', // Simulado
+                        numeroRecibo: 'F' + Math.floor(Math.random() * 1000000), // Simulado
+                        fechaEmision: new Date().toISOString().split('T')[0], // Simulado
                         mes: new Date().toISOString().substring(0, 7), // YYYY-MM
                         consumoKWh: consumo,
                         demandaKW: demanda,
@@ -407,6 +684,9 @@
             // Obtener datos del formulario manual
             const manualReceipts = document.querySelectorAll('.receipt-entry');
             manualReceipts.forEach(entry => {
+                const proveedor = entry.querySelector('.receipt-provider')?.value;
+                const numeroRecibo = entry.querySelector('.receipt-number')?.value;
+                const fechaEmision = entry.querySelector('.receipt-date')?.value;
                 const mes = entry.querySelector('.receipt-month')?.value;
                 const consumo = entry.querySelector('.receipt-consumption')?.value;
                 const demanda = entry.querySelector('.receipt-demand')?.value;
@@ -415,6 +695,9 @@
                 
                 if (monto) { // Al menos el monto es requerido
                     receipts.push({
+                        proveedor: proveedor || 'No especificado',
+                        numeroRecibo: numeroRecibo || 'No especificado',
+                        fechaEmision: fechaEmision || new Date().toISOString().split('T')[0],
                         mes: mes || new Date().toISOString().substring(0, 7),
                         consumoKWh: parseFloat(consumo) || 0,
                         demandaKW: parseFloat(demanda) || 0,
@@ -427,13 +710,45 @@
             // Si no hay datos, usar datos de ejemplo
             if (receipts.length === 0) {
                 const exampleData = [
-                    { mes: '2025-01', consumoKWh: 3017, demandaKW: 8.20, factorPotencia: 0.51, montoTotal: 373225 },
-                    { mes: '2025-02', consumoKWh: 3500, demandaKW: 9.10, factorPotencia: 0.52, montoTotal: 410000 },
-                    { mes: '2025-03', consumoKWh: 3200, demandaKW: 8.50, factorPotencia: 0.50, montoTotal: 385000 }
+                    { 
+                        proveedor: 'ICE',
+                        numeroRecibo: 'F123456',
+                        fechaEmision: '2025-01-15',
+                        mes: '2025-01', 
+                        consumoKWh: 3017, 
+                        demandaKW: 8.20, 
+                        factorPotencia: 0.51, 
+                        montoTotal: 373225 
+                    },
+                    { 
+                        proveedor: 'CNFL',
+                        numeroRecibo: 'F234567',
+                        fechaEmision: '2025-02-15',
+                        mes: '2025-02', 
+                        consumoKWh: 3500, 
+                        demandaKW: 9.10, 
+                        factorPotencia: 0.52, 
+                        montoTotal: 410000 
+                    },
+                    { 
+                        proveedor: 'ICE',
+                        numeroRecibo: 'F345678',
+                        fechaEmision: '2025-03-15',
+                        mes: '2025-03', 
+                        consumoKWh: 3200, 
+                        demandaKW: 8.50, 
+                        factorPotencia: 0.50, 
+                        montoTotal: 385000 
+                    }
                 ];
+                
+                // Actualizar el análisis actual con estos datos de ejemplo
+                currentAnalysis.receipts = exampleData;
                 return exampleData;
             }
             
+            // Actualizar el análisis actual con los datos recolectados
+            currentAnalysis.receipts = receipts;
             return receipts;
         }
 
@@ -637,91 +952,378 @@
             });
             
             // Generar gráfico de consumo
-            const consumptionCtx = document.getElementById('consumption-chart').getContext('2d');
-            new Chart(consumptionCtx, {
-                type: 'bar',
-                data: {
-                    labels: results.months,
-                    datasets: [{
-                        label: 'Consumo (kWh)',
-                        data: results.consumptionData,
-                        backgroundColor: 'rgba(59, 130, 246, 0.5)',
-                        borderColor: 'rgba(59, 130, 246, 1)',
-                        borderWidth: 1
-                    }]
-                },
-                options: {
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            title: {
-                                display: true,
-                                text: 'kWh'
-                            }
-                        }
-                    },
-                    responsive: true,
-                    maintainAspectRatio: false
+            try {
+                const consumptionCanvas = document.getElementById('consumption-chart');
+                const consumptionCtx = consumptionCanvas.getContext('2d');
+                
+                // Verificar si ya existe un gráfico y destruirlo
+                if (consumptionCanvas.chart) {
+                    consumptionCanvas.chart.destroy();
                 }
-            });
-            
-            // Generar gráfico de ahorro
-            const savingsCtx = document.getElementById('savings-chart').getContext('2d');
-            const labels = Array.from({length: 37}, (_, i) => `Mes ${i}`);
-            const ahorroData = results.cashFlow.map(flow => flow.ahorroAcumulado);
-            
-            new Chart(savingsCtx, {
-                type: 'line',
-                data: {
-                    labels: labels,
-                    datasets: [{
-                        label: 'Ahorro Acumulado',
-                        data: ahorroData,
-                        borderColor: 'rgba(16, 185, 129, 1)',
-                        backgroundColor: 'rgba(16, 185, 129, 0.1)',
-                        borderWidth: 2,
-                        fill: true,
-                        tension: 0.3
-                    }]
-                },
-                options: {
-                    scales: {
-                        y: {
-                            title: {
-                                display: true,
-                                text: 'Colones (₡)'
-                            }
-                        },
-                        x: {
-                            title: {
-                                display: true,
-                                text: 'Tiempo'
-                            }
-                        }
+                
+                consumptionCanvas.chart = new Chart(consumptionCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: results.months,
+                        datasets: [{
+                            label: 'Consumo (kWh)',
+                            data: results.consumptionData,
+                            backgroundColor: 'rgba(59, 130, 246, 0.5)',
+                            borderColor: 'rgba(59, 130, 246, 1)',
+                            borderWidth: 1
+                        }]
                     },
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        annotation: {
-                            annotations: {
-                                line1: {
-                                    type: 'line',
-                                    yMin: 0,
-                                    yMax: 0,
-                                    borderColor: 'rgb(0, 0, 0)',
-                                    borderWidth: 1,
-                                    borderDash: [5, 5]
+                    options: {
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                title: {
+                                    display: true,
+                                    text: 'kWh'
                                 }
                             }
-                        }
+                        },
+                        responsive: true,
+                        maintainAspectRatio: false
                     }
+                });
+            } catch (e) {
+                console.error('Error al generar gráfico de consumo:', e);
+            }
+            
+            // Generar gráfico de ahorro
+            try {
+                const savingsCanvas = document.getElementById('savings-chart');
+                const savingsCtx = savingsCanvas.getContext('2d');
+                const labels = Array.from({length: 37}, (_, i) => `Mes ${i}`);
+                const ahorroData = results.cashFlow.map(flow => flow.ahorroAcumulado);
+                
+                // Verificar si ya existe un gráfico y destruirlo
+                if (savingsCanvas.chart) {
+                    savingsCanvas.chart.destroy();
                 }
-            });
+                
+                savingsCanvas.chart = new Chart(savingsCtx, {
+                    type: 'line',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: 'Ahorro Acumulado',
+                            data: ahorroData,
+                            borderColor: 'rgba(16, 185, 129, 1)',
+                            backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                            borderWidth: 2,
+                            fill: true,
+                            tension: 0.3
+                        }]
+                    },
+                    options: {
+                        scales: {
+                            y: {
+                                title: {
+                                    display: true,
+                                    text: 'Colones (₡)'
+                                }
+                            },
+                            x: {
+                                title: {
+                                    display: true,
+                                    text: 'Tiempo'
+                                }
+                            }
+                        },
+                        responsive: true,
+                        maintainAspectRatio: false
+                    }
+                });
+            } catch (e) {
+                console.error('Error al generar gráfico de ahorro:', e);
+            }
+        }
+        
+        // Función para exportar a PDF
+        function exportPDF(analysis) {
+            const results = analysis.results;
+            if (!results) {
+                alert('No hay resultados para exportar');
+                return;
+            }
+            
+            // Formatear números
+            const formatNumber = (num) => new Intl.NumberFormat('es-CR').format(Math.round(num));
+            const formatColones = (num) => '₡' + formatNumber(num);
+            
+            try {
+                // Crear nueva instancia de jsPDF
+                const { jsPDF } = window.jspdf;
+                const doc = new jsPDF();
+                
+                // Título
+                doc.setFontSize(18);
+                doc.text('Análisis de Recibos Eléctricos', 105, 15, { align: 'center' });
+                
+                // Datos del cliente
+                doc.setFontSize(14);
+                doc.text('Datos del Cliente', 15, 25);
+                doc.setFontSize(12);
+                doc.text(`Cliente: ${analysis.clientName}`, 15, 35);
+                doc.text(`Fecha: ${new Date(analysis.date).toLocaleDateString()}`, 15, 42);
+                doc.text(`Recibos analizados: ${analysis.receipts.length}`, 15, 49);
+                
+                // Información del modelo recomendado
+                doc.setFontSize(14);
+                doc.text('Equipo Recomendado', 15, 60);
+                
+                doc.setFontSize(12);
+                doc.text(`Modelo: ${results.modeloRecomendado}`, 15, 70);
+                doc.text(`Descripción: ${results.aplicacion} (${results.rango})`, 15, 77);
+                doc.text(`Precio: ${formatColones(results.precioEquipo)}`, 15, 84);
+                doc.text(`Prima Inicial: ${formatColones(results.primaInicial)}`, 15, 91);
+                doc.text(`Cuota Mensual: ${formatColones(results.cuotaMensual)}`, 15, 98);
+                
+                // Resumen de consumo
+                doc.setFontSize(14);
+                doc.text('Resumen de Consumo', 15, 110);
+                
+                doc.setFontSize(12);
+                doc.text(`Consumo Promedio: ${formatNumber(results.consumoPromedio)} kWh`, 15, 120);
+                doc.text(`Demanda Promedio: ${results.demandaPromedio.toFixed(2)} kW`, 15, 127);
+                doc.text(`Factor de Potencia Promedio: ${results.factorPotenciaPromedio.toFixed(2)}`, 15, 134);
+                doc.text(`Factura Promedio: ${formatColones(results.montoPromedio)}`, 15, 141);
+                
+                // Análisis financiero
+                doc.setFontSize(14);
+                doc.text('Análisis Financiero', 15, 155);
+                
+                doc.setFontSize(12);
+                doc.text(`Ahorro Estimado Mensual: ${formatColones(results.ahorroEstimado)}`, 15, 165);
+                doc.text(`Flujo Mensual: ${formatColones(results.ahorroNeto)}`, 15, 172);
+                doc.text(`Tiempo de Recuperación: ${Math.ceil(results.tiempoRecuperacion)} meses`, 15, 179);
+                doc.text(`Ahorro al Finalizar Financiamiento: ${formatColones(results.ahorroTotal24Meses)}`, 15, 186);
+                doc.text(`Ahorro Total en 5 Años: ${formatColones(results.ahorro5Anos)}`, 15, 193);
+                
+                // Tabla de flujo de caja (siguiente página)
+                doc.addPage();
+                doc.setFontSize(14);
+                doc.text('Comparativa de Flujo de Caja', 105, 15, { align: 'center' });
+                
+                // Datos para la tabla
+                const tableData = [];
+                
+                // Encabezados
+                tableData.push(['Período', 'Sin Equipo', 'Con Equipo (financiamiento)', 'Con Equipo (después)', 'Ahorro Acumulado']);
+                
+                // Filas
+                for (let i = 0; i <= 36; i += 4) { // Reducimos el número de filas para que quepa en el PDF
+                    const flow = results.cashFlow[i];
+                    if (!flow) continue;
+                    
+                    let label = `Mes ${i}`;
+                    if (i === 0) label = 'Inversión Inicial';
+                    if (i === 24) label = 'Mes 24 (Fin de financiamiento)';
+                    if (i === 36) label = 'Mes 36 (3 años)';
+                    
+                    let sinEquipoText = i === 0 ? '₡0' : formatColones(flow.sinEquipo);
+                    let conFinanciamientoText = i === 0 ? `-${formatColones(flow.conEquipoFinanciamiento)}` : 
+                                              i <= 24 ? formatColones(flow.conEquipoFinanciamiento) : 'N/A';
+                    let conDespuesText = i > 24 ? formatColones(flow.conEquipoDespues) : 'N/A';
+                    let ahorroText = flow.ahorroAcumulado >= 0 
+                                    ? formatColones(flow.ahorroAcumulado) 
+                                    : `-${formatColones(Math.abs(flow.ahorroAcumulado))}`;
+                    
+                    tableData.push([label, sinEquipoText, conFinanciamientoText, conDespuesText, ahorroText]);
+                }
+                
+                // Generar tabla en PDF
+                doc.autoTable({
+                    head: [tableData[0]],
+                    body: tableData.slice(1),
+                    startY: 25,
+                    margin: { top: 20 },
+                    styles: {
+                        lineColor: [0, 0, 0],
+                        lineWidth: 0.1
+                    },
+                    headStyles: {
+                        fillColor: [59, 130, 246],
+                        textColor: 255,
+                        fontStyle: 'bold'
+                    },
+                    alternateRowStyles: {
+                        fillColor: [240, 249, 255]
+                    }
+                });
+                
+                // Agregar pie de página
+                const pageCount = doc.internal.getNumberOfPages();
+                for(let i = 1; i <= pageCount; i++) {
+                    doc.setPage(i);
+                    doc.setFontSize(10);
+                    doc.text(`Página ${i} de ${pageCount}`, 105, doc.internal.pageSize.height - 10, { align: 'center' });
+                    doc.text('Análisis generado por Analizador de Recibos Eléctricos', 105, doc.internal.pageSize.height - 5, { align: 'center' });
+                }
+                
+                // Guardar el PDF
+                const filename = `analisis_${analysis.clientName.replace(/\s+/g, '_').toLowerCase()}.pdf`;
+                doc.save(filename);
+            } catch (error) {
+                console.error('Error al exportar PDF
+cat >> index.html.improved << 'EOL'
+                console.error('Error al exportar PDF:', error);
+                alert('Hubo un error al exportar a PDF. Por favor, intente nuevamente.');
+            }
+        }
+        
+        // Función para exportar a Excel
+        function exportExcel(analysis) {
+            const results = analysis.results;
+            if (!results) {
+                alert('No hay resultados para exportar');
+                return;
+            }
+            
+            // Formatear números
+            const formatNumber = (num) => new Intl.NumberFormat('es-CR').format(Math.round(num));
+            const formatColones = (num) => '₡' + formatNumber(num);
+            
+            try {
+                // Crear libro de trabajo Excel
+                const wb = XLSX.utils.book_new();
+                wb.Props = {
+                    Title: "Análisis de Recibos Eléctricos - " + analysis.clientName,
+                    Author: "Analizador de Recibos",
+                    CreatedDate: new Date()
+                };
+                
+                // Datos del resumen
+                const resumenData = [
+                    ["Análisis de Recibos Eléctricos"],
+                    [""],
+                    ["DATOS DEL CLIENTE"],
+                    ["Cliente", analysis.clientName],
+                    ["Fecha", new Date(analysis.date).toLocaleDateString()],
+                    ["Recibos analizados", analysis.receipts.length],
+                    [""],
+                    ["RESUMEN DE CONSUMO"],
+                    ["Consumo Promedio", formatNumber(results.consumoPromedio) + " kWh"],
+                    ["Demanda Promedio", results.demandaPromedio.toFixed(2) + " kW"],
+                    ["Factor de Potencia Promedio", results.factorPotenciaPromedio.toFixed(2)],
+                    ["Factura Promedio", formatColones(results.montoPromedio)],
+                    [""],
+                    ["EQUIPO RECOMENDADO"],
+                    ["Modelo", results.modeloRecomendado],
+                    ["Descripción", `${results.aplicacion} (${results.rango})`],
+                    ["Precio", formatColones(results.precioEquipo)],
+                    ["Prima Inicial", formatColones(results.primaInicial)],
+                    ["Cuota Mensual", formatColones(results.cuotaMensual)],
+                    [""],
+                    ["ANÁLISIS FINANCIERO"],
+                    ["Ahorro Estimado Mensual", formatColones(results.ahorroEstimado)],
+                    ["Flujo Mensual", formatColones(results.ahorroNeto)],
+                    ["Tiempo de Recuperación", `${Math.ceil(results.tiempoRecuperacion)} meses`],
+                    ["Ahorro al Finalizar Financiamiento", formatColones(results.ahorroTotal24Meses)],
+                    ["Ahorro Total en 5 Años", formatColones(results.ahorro5Anos)]
+                ];
+                
+                // Crear hoja para el resumen
+                const wsResumen = XLSX.utils.aoa_to_sheet(resumenData);
+                XLSX.utils.book_append_sheet(wb, wsResumen, "Resumen");
+                
+                // Datos de recibos
+                const recibosData = [
+                    ["Proveedor", "Número de Recibo", "Fecha de Emisión", "Mes", "Consumo (kWh)", "Demanda (kW)", "Factor de Potencia", "Monto Total (₡)"]
+                ];
+                
+                analysis.receipts.forEach(receipt => {
+                    recibosData.push([
+                        receipt.proveedor,
+                        receipt.numeroRecibo,
+                        receipt.fechaEmision,
+                        receipt.mes,
+                        receipt.consumoKWh,
+                        receipt.demandaKW,
+                        receipt.factorPotencia,
+                        receipt.montoTotal
+                    ]);
+                });
+                
+                // Crear hoja para los recibos
+                const wsRecibos = XLSX.utils.aoa_to_sheet(recibosData);
+                XLSX.utils.book_append_sheet(wb, wsRecibos, "Recibos");
+                
+                // Datos para el flujo de caja
+                const cashFlowData = [
+                    ["Período", "Sin Equipo", "Con Equipo (durante financiamiento)", "Con Equipo (después de financiamiento)", "Ahorro Acumulado"]
+                ];
+                
+                results.cashFlow.forEach((flow, index) => {
+                    let label = `Mes ${index}`;
+                    if (index === 0) label = 'Inversión Inicial';
+                    if (index === 24) label += ' (Fin de financiamiento)';
+                    if (index === 36) label += ' (3 años)';
+                    
+                    cashFlowData.push([
+                        label,
+                        flow.sinEquipo,
+                        flow.conEquipoFinanciamiento,
+                        flow.conEquipoDespues,
+                        flow.ahorroAcumulado
+                    ]);
+                });
+                
+                // Crear hoja para el flujo de caja
+                const wsFlujo = XLSX.utils.aoa_to_sheet(cashFlowData);
+                XLSX.utils.book_append_sheet(wb, wsFlujo, "Flujo de Caja");
+                
+                // Guardar el archivo Excel
+                const filename = `analisis_${analysis.clientName.replace(/\s+/g, '_').toLowerCase()}.xlsx`;
+                XLSX.writeFile(wb, filename);
+            } catch (error) {
+                console.error('Error al exportar Excel:', error);
+                alert('Hubo un error al exportar a Excel. Por favor, intente nuevamente.');
+            }
+        }
+        
+        // Función para finalizar análisis
+        function finishAnalysis() {
+            // Verificar que hay datos básicos
+            if (!currentAnalysis || !currentAnalysis.clientName) {
+                alert('Por favor, ingrese el nombre del cliente antes de finalizar el análisis.');
+                return;
+            }
+            
+            // Guardar el análisis
+            if (!currentAnalysis.results) {
+                alert('No hay resultados para guardar. Por favor, realice el análisis primero.');
+                return;
+            }
+            
+            // Verificar si ya existe un análisis con el mismo id
+            const existingIndex = savedAnalyses.findIndex(a => a.id === currentAnalysis.id);
+            if (existingIndex >= 0) {
+                savedAnalyses[existingIndex] = currentAnalysis;
+            } else {
+                savedAnalyses.push(currentAnalysis);
+            }
+            
+            // Guardar en localStorage
+            saveAnalyses();
+            
+            // Mostrar la sección de historial
+            document.getElementById('history-section').classList.remove('hidden');
+            document.getElementById('upload-section').classList.add('hidden');
+            document.getElementById('results-section').classList.add('hidden');
+            
+            // Actualizar la lista de análisis
+            updateAnalysisList();
         }
         
         // Inicializar la aplicación cuando se carga el DOM
         document.addEventListener('DOMContentLoaded', function() {
             console.log('Inicializando aplicación...');
+            
+            // Cargar análisis guardados
+            loadSavedAnalyses();
             
             // Inicializar Dropzone
             Dropzone.autoDiscover = false;
@@ -749,6 +1351,18 @@
                 console.error('Error al inicializar Dropzone:', error);
             }
             
+            // Botón para crear nuevo análisis
+            document.getElementById('new-analysis-btn').addEventListener('click', function() {
+                createNewAnalysis();
+            });
+            
+            // Botón para volver al historial desde el formulario
+            document.getElementById('back-to-history-btn').addEventListener('click', function() {
+                document.getElementById('history-section').classList.remove('hidden');
+                document.getElementById('upload-section').classList.add('hidden');
+                document.getElementById('results-section').classList.add('hidden');
+            });
+            
             // Eventos para mostrar/ocultar formulario manual
             document.getElementById('show-manual-btn').addEventListener('click', function() {
                 console.log('Mostrando formulario manual');
@@ -760,32 +1374,50 @@
                 console.log('Ocultando formulario manual');
                 document.getElementById('manual-entry-form').classList.add('hidden');
                 document.getElementById('show-manual-btn').classList.remove('hidden');
+                
                 // Restablecer el formulario
                 document.getElementById('manual-receipts').innerHTML = `
                     <div class="receipt-entry mb-4 p-4 border border-gray-200 rounded-lg">
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Proveedor de Electricidad*</label>
+                                <input type="text" class="receipt-provider w-full p-2 border border-gray-300 rounded" placeholder="Ej. ICE" required>
+                            </div>
+                            
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Número de Recibo*</label>
+                                <input type="text" class="receipt-number w-full p-2 border border-gray-300 rounded" placeholder="Ej. 12345678" required>
+                            </div>
+                            
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Fecha de Emisión*</label>
+                                <input type="date" class="receipt-date w-full p-2 border border-gray-300 rounded" required>
+                            </div>
+                        </div>
+                        
                         <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
                             <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1">Mes</label>
-                                <input type="month" class="receipt-month w-full p-2 border border-gray-300 rounded">
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Mes de Facturación*</label>
+                                <input type="month" class="receipt-month w-full p-2 border border-gray-300 rounded" required>
                             </div>
                             
                             <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1">Consumo (kWh)</label>
-                                <input type="number" class="receipt-consumption w-full p-2 border border-gray-300 rounded" placeholder="Ej. 3000">
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Consumo (kWh)*</label>
+                                <input type="number" class="receipt-consumption w-full p-2 border border-gray-300 rounded" placeholder="Ej. 3000" required>
                             </div>
                             
                             <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1">Demanda (kW)</label>
-                                <input type="number" class="receipt-demand w-full p-2 border border-gray-300 rounded" placeholder="Ej. 15">
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Demanda (kW)*</label>
+                                <input type="number" class="receipt-demand w-full p-2 border border-gray-300 rounded" placeholder="Ej. 15" required>
                             </div>
                             
                             <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1">Factor de Potencia</label>
-                                <input type="number" step="0.01" min="0" max="1" class="receipt-factor w-full p-2 border border-gray-300 rounded" placeholder="Ej. 0.85">
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Factor de Potencia*</label>
+                                <input type="number" step="0.01" min="0" max="1" class="receipt-factor w-full p-2 border border-gray-300 rounded" placeholder="Ej. 0.85" required>
                             </div>
                             
                             <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1">Monto Total (₡)</label>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Monto Total (₡)*</label>
                                 <input type="number" class="receipt-amount w-full p-2 border border-gray-300 rounded" placeholder="Ej. 150000" required>
                             </div>
                         </div>
@@ -806,29 +1438,45 @@
                             Eliminar
                         </button>
                     </div>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Proveedor de Electricidad*</label>
+                            <input type="text" class="receipt-provider w-full p-2 border border-gray-300 rounded" placeholder="Ej. ICE" required>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Número de Recibo*</label>
+                            <input type="text" class="receipt-number w-full p-2 border border-gray-300 rounded" placeholder="Ej. 12345678" required>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Fecha de Emisión*</label>
+                            <input type="date" class="receipt-date w-full p-2 border border-gray-300 rounded" required>
+                        </div>
+                    </div>
                     <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Mes</label>
-                            <input type="month" class="receipt-month w-full p-2 border border-gray-300 rounded">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Mes de Facturación*</label>
+                            <input type="month" class="receipt-month w-full p-2 border border-gray-300 rounded" required>
                         </div>
                         
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Consumo (kWh)</label>
-                            <input type="number" class="receipt-consumption w-full p-2 border border-gray-300 rounded" placeholder="Ej. 3000">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Consumo (kWh)*</label>
+                            <input type="number" class="receipt-consumption w-full p-2 border border-gray-300 rounded" placeholder="Ej. 3000" required>
                         </div>
                         
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Demanda (kW)</label>
-                            <input type="number" class="receipt-demand w-full p-2 border border-gray-300 rounded" placeholder="Ej. 15">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Demanda (kW)*</label>
+                            <input type="number" class="receipt-demand w-full p-2 border border-gray-300 rounded" placeholder="Ej. 15" required>
                         </div>
                         
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Factor de Potencia</label>
-                            <input type="number" step="0.01" min="0" max="1" class="receipt-factor w-full p-2 border border-gray-300 rounded" placeholder="Ej. 0.85">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Factor de Potencia*</label>
+                            <input type="number" step="0.01" min="0" max="1" class="receipt-factor w-full p-2 border border-gray-300 rounded" placeholder="Ej. 0.85" required>
                         </div>
                         
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Monto Total (₡)</label>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Monto Total (₡)*</label>
                             <input type="number" class="receipt-amount w-full p-2 border border-gray-300 rounded" placeholder="Ej. 150000" required>
                         </div>
                     </div>
@@ -842,10 +1490,50 @@
                 });
             });
 
+            // Guardar datos del cliente
+            document.getElementById('save-data-btn').addEventListener('click', function() {
+                const clientName = document.getElementById('client-name').value.trim();
+                if (!clientName) {
+                    alert('Por favor, ingrese el nombre del cliente.');
+                    return;
+                }
+                
+                currentAnalysis.clientName = clientName;
+                
+                // Actualizar receipts si hay datos en el formulario manual
+                const manualReceipts = getReceiptData();
+                if (manualReceipts.length > 0) {
+                    currentAnalysis.receipts = manualReceipts;
+                }
+                
+                // Guardar en localStorage
+                const existingIndex = savedAnalyses.findIndex(a => a.id === currentAnalysis.id);
+                if (existingIndex >= 0) {
+                    savedAnalyses[existingIndex] = currentAnalysis;
+                } else {
+                    savedAnalyses.push(currentAnalysis);
+                }
+                
+                saveAnalyses();
+                
+                alert('Datos guardados correctamente.');
+            });
+
             // Evento para analizar recibos
             document.getElementById('analyze-btn').addEventListener('click', function() {
                 console.log('Iniciando análisis');
-                // Obtener datos de recibos (combinar datos de archivos y manual)
+                
+                // Verificar que hay un nombre de cliente
+                const clientName = document.getElementById('client-name').value.trim();
+                if (!clientName) {
+                    alert('Por favor, ingrese el nombre del cliente antes de analizar.');
+                    return;
+                }
+                
+                // Actualizar datos del cliente
+                currentAnalysis.clientName = clientName;
+                
+                // Obtener datos de recibos
                 const receipts = getReceiptData();
                 
                 if (receipts.length === 0) {
@@ -855,6 +1543,13 @@
                 
                 // Realizar análisis
                 const results = analyzeReceipts(receipts);
+                
+                // Guardar resultados en el análisis actual
+                currentAnalysis.results = results;
+                
+                // Actualizar interfaz de resultados
+                document.getElementById('results-client-name').textContent = currentAnalysis.clientName;
+                document.getElementById('results-date').textContent = new Date(currentAnalysis.date).toLocaleDateString();
                 
                 // Mostrar resultados
                 displayResults(results);
@@ -870,165 +1565,34 @@
                 document.getElementById('upload-section').classList.remove('hidden');
             });
 
-            // Evento para exportar a PDF
-            document.getElementById('export-pdf-btn').addEventListener('click', function() {
-                // Crear nueva instancia de jsPDF
-                const { jsPDF } = window.jspdf;
-                const doc = new jsPDF();
-                
-                // Título
-                doc.setFontSize(18);
-                doc.text('Análisis de Recibos Eléctricos', 105, 15, { align: 'center' });
-                
-                // Información del modelo recomendado
-                doc.setFontSize(14);
-                doc.text('Equipo Recomendado', 15, 25);
-                
-                doc.setFontSize(12);
-                doc.text(`Modelo: ${document.getElementById('recommended-model').textContent}`, 15, 35);
-                doc.text(`Descripción: ${document.getElementById('model-description').textContent}`, 15, 42);
-                doc.text(`Precio: ${document.getElementById('model-price').textContent}`, 15, 49);
-                doc.text(`Prima Inicial: ${document.getElementById('model-downpayment').textContent}`, 15, 56);
-                doc.text(`Cuota Mensual: ${document.getElementById('model-monthly').textContent}`, 15, 63);
-                
-                // Resumen de consumo
-                doc.setFontSize(14);
-                doc.text('Resumen de Consumo', 15, 75);
-                
-                doc.setFontSize(12);
-                doc.text(`Consumo Promedio: ${document.getElementById('avg-consumption').textContent}`, 15, 85);
-                doc.text(`Demanda Promedio: ${document.getElementById('avg-demand').textContent}`, 15, 92);
-                doc.text(`Factor de Potencia Promedio: ${document.getElementById('avg-factor').textContent}`, 15, 99);
-                doc.text(`Factura Promedio: ${document.getElementById('avg-amount').textContent}`, 15, 106);
-                
-                // Análisis financiero
-                doc.setFontSize(14);
-                doc.text('Análisis Financiero', 15, 118);
-                
-                doc.setFontSize(12);
-                doc.text(`Ahorro Estimado Mensual: ${document.getElementById('monthly-savings').textContent}`, 15, 128);
-                doc.text(`Flujo Mensual: ${document.getElementById('net-flow').textContent}`, 15, 135);
-                doc.text(`Tiempo de Recuperación: ${document.getElementById('roi-time').textContent}`, 15, 142);
-                doc.text(`Ahorro al Finalizar Financiamiento: ${document.getElementById('savings-after-financing').textContent}`, 15, 149);
-                doc.text(`Ahorro Total en 5 Años: ${document.getElementById('savings-5-years').textContent}`, 15, 156);
-                
-                // Tabla de flujo de caja (primera página)
-                doc.addPage();
-                doc.setFontSize(14);
-                doc.text('Comparativa de Flujo de Caja', 105, 15, { align: 'center' });
-                
-                // Obtener datos de la tabla
-                const table = document.getElementById('cash-flow-table');
-                const tableData = [];
-                
-                // Encabezados
-                const headerRow = [];
-                const headerCells = table.querySelectorAll('thead th');
-                headerCells.forEach(cell => {
-                    headerRow.push(cell.textContent);
-                });
-                tableData.push(headerRow);
-                
-                // Filas de datos
-                const rows = table.querySelectorAll('tbody tr');
-                rows.forEach(row => {
-                    const dataRow = [];
-                    const cells = row.querySelectorAll('td');
-                    cells.forEach(cell => {
-                        dataRow.push(cell.textContent);
-                    });
-                    tableData.push(dataRow);
-                });
-                
-                // Generar tabla en PDF
-                doc.autoTable({
-                    head: [tableData[0]],
-                    body: tableData.slice(1, 10), // Primeras 10 filas
-                    startY: 25,
-                    margin: { top: 20 },
-                });
-                
-                // Agregar pie de página
-                const pageCount = doc.internal.getNumberOfPages();
-                for(let i = 1; i <= pageCount; i++) {
-                    doc.setPage(i);
-                    doc.setFontSize(10);
-                    doc.text(`Página ${i} de ${pageCount}`, 105, doc.internal.pageSize.height - 10, { align: 'center' });
-                    doc.text('Análisis generado por Analizador de Recibos Eléctricos', 105, doc.internal.pageSize.height - 5, { align: 'center' });
-                }
-                
-                // Guardar el PDF
-                doc.save('analisis_recibos_electricos.pdf');
+            // Evento para editar datos
+            document.getElementById('edit-data-btn').addEventListener('click', function() {
+                document.getElementById('results-section').classList.add('hidden');
+                document.getElementById('upload-section').classList.remove('hidden');
             });
 
-            // Evento para exportar a Excel
+            // Eventos para exportar
+            document.getElementById('export-pdf-btn').addEventListener('click', function() {
+                exportPDF(currentAnalysis);
+            });
+
             document.getElementById('export-excel-btn').addEventListener('click', function() {
-                // Crear libro de trabajo Excel
-                const wb = XLSX.utils.book_new();
-                wb.Props = {
-                    Title: "Análisis de Recibos Eléctricos",
-                    Author: "Analizador de Recibos",
-                    CreatedDate: new Date()
-                };
-                
-                // Datos del resumen
-                const resumenData = [
-                    ["Análisis de Recibos Eléctricos"],
-                    [""],
-                    ["RESUMEN DE CONSUMO"],
-                    ["Consumo Promedio", document.getElementById('avg-consumption').textContent],
-                    ["Demanda Promedio", document.getElementById('avg-demand').textContent],
-                    ["Factor de Potencia Promedio", document.getElementById('avg-factor').textContent],
-                    ["Factura Promedio", document.getElementById('avg-amount').textContent],
-                    [""],
-                    ["EQUIPO RECOMENDADO"],
-                    ["Modelo", document.getElementById('recommended-model').textContent],
-                    ["Descripción", document.getElementById('model-description').textContent],
-                    ["Precio", document.getElementById('model-price').textContent],
-                    ["Prima Inicial", document.getElementById('model-downpayment').textContent],
-                    ["Cuota Mensual", document.getElementById('model-monthly').textContent],
-                    [""],
-                    ["ANÁLISIS FINANCIERO"],
-                    ["Ahorro Estimado Mensual", document.getElementById('monthly-savings').textContent],
-                    ["Flujo Mensual", document.getElementById('net-flow').textContent],
-                    ["Tiempo de Recuperación", document.getElementById('roi-time').textContent],
-                    ["Ahorro al Finalizar Financiamiento", document.getElementById('savings-after-financing').textContent],
-                    ["Ahorro Total en 5 Años", document.getElementById('savings-5-years').textContent]
-                ];
-                
-                // Crear hoja para el resumen
-                const wsResumen = XLSX.utils.aoa_to_sheet(resumenData);
-                XLSX.utils.book_append_sheet(wb, wsResumen, "Resumen");
-                
-                // Obtener datos de la tabla de flujo de caja
-                const table = document.getElementById('cash-flow-table');
-                const tableData = [];
-                
-                // Encabezados
-                const headerRow = [];
-                const headerCells = table.querySelectorAll('thead th');
-                headerCells.forEach(cell => {
-                    headerRow.push(cell.textContent);
-                });
-                tableData.push(headerRow);
-                
-                // Filas de datos
-                const rows = table.querySelectorAll('tbody tr');
-                rows.forEach(row => {
-                    const dataRow = [];
-                    const cells = row.querySelectorAll('td');
-                    cells.forEach(cell => {
-                        dataRow.push(cell.textContent);
-                    });
-                    tableData.push(dataRow);
-                });
-                
-                // Crear hoja para el flujo de caja
-                const wsFlujo = XLSX.utils.aoa_to_sheet(tableData);
-                XLSX.utils.book_append_sheet(wb, wsFlujo, "Flujo de Caja");
-                
-                // Guardar el archivo Excel
-                XLSX.writeFile(wb, "analisis_recibos_electricos.xlsx");
+                exportExcel(currentAnalysis);
+            });
+
+            // Evento para finalizar análisis
+            document.getElementById('finish-analysis-btn').addEventListener('click', function() {
+                document.getElementById('finish-modal').classList.remove('hidden');
+            });
+
+            // Eventos del modal de finalización
+            document.getElementById('cancel-finish-btn').addEventListener('click', function() {
+                document.getElementById('finish-modal').classList.add('hidden');
+            });
+
+            document.getElementById('confirm-finish-btn').addEventListener('click', function() {
+                document.getElementById('finish-modal').classList.add('hidden');
+                finishAnalysis();
             });
             
             console.log('Aplicación inicializada correctamente');
