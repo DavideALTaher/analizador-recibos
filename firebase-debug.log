@@ -1,0 +1,106 @@
+[debug] [2025-07-16T01:37:36.794Z] ----------------------------------------------------------------------
+[debug] [2025-07-16T01:37:36.797Z] Command:       /usr/local/nvm/versions/node/v22.17.0/bin/node /usr/local/node_packages/node_modules/.bin/firebase init hosting
+[debug] [2025-07-16T01:37:36.798Z] CLI Version:   13.28.0
+[debug] [2025-07-16T01:37:36.798Z] Platform:      linux
+[debug] [2025-07-16T01:37:36.798Z] Node Version:  v22.17.0
+[debug] [2025-07-16T01:37:36.799Z] Time:          Wed Jul 16 2025 01:37:36 GMT+0000 (Coordinated Universal Time)
+[debug] [2025-07-16T01:37:36.799Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2025-07-16T01:37:36.807Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2025-07-16T01:37:36.808Z] > authorizing via signed-in user (davide.t@terrazasdelcaribe.com)
+[info] 
+     ######## #### ########  ######## ########     ###     ######  ########
+     ##        ##  ##     ## ##       ##     ##  ##   ##  ##       ##
+     ######    ##  ########  ######   ########  #########  ######  ######
+     ##        ##  ##    ##  ##       ##     ## ##     ##       ## ##
+     ##       #### ##     ## ######## ########  ##     ##  ######  ########
+
+You're about to initialize a Firebase project in this directory:
+
+  /home/davide_t/analizador-recibos
+
+[info] 
+=== Project Setup
+[info] 
+[info] First, let's associate this project directory with a Firebase project.
+[info] You can create multiple project aliases by running firebase use --add, 
+[info] but for now we'll just set up a default project.
+[info] 
+[debug] [2025-07-16T01:38:05.617Z] Checked if tokens are valid: true, expires at: 1752633389256
+[debug] [2025-07-16T01:38:05.618Z] Checked if tokens are valid: true, expires at: 1752633389256
+[debug] [2025-07-16T01:38:05.622Z] >>> [apiv2][query] GET https://firebase.googleapis.com/v1beta1/projects pageSize=100
+[debug] [2025-07-16T01:38:05.922Z] <<< [apiv2][status] GET https://firebase.googleapis.com/v1beta1/projects 403
+[debug] [2025-07-16T01:38:05.922Z] <<< [apiv2][body] GET https://firebase.googleapis.com/v1beta1/projects [omitted]
+[debug] [2025-07-16T01:38:05.924Z] Request to https://firebase.googleapis.com/v1beta1/projects?pageSize=100 had HTTP Error: 403, Firebase Management API has not been used in project analisis-recibos-energeticos before or it is disabled. Enable it by visiting https://console.developers.google.com/apis/api/firebase.googleapis.com/overview?project=analisis-recibos-energeticos then retry. If you enabled this API recently, wait a few minutes for the action to propagate to our systems and retry.
+[debug] [2025-07-16T01:38:05.949Z] FirebaseError: Request to https://firebase.googleapis.com/v1beta1/projects?pageSize=100 had HTTP Error: 403, Firebase Management API has not been used in project analisis-recibos-energeticos before or it is disabled. Enable it by visiting https://console.developers.google.com/apis/api/firebase.googleapis.com/overview?project=analisis-recibos-energeticos then retry. If you enabled this API recently, wait a few minutes for the action to propagate to our systems and retry.
+    at responseToError (/usr/local/node_packages/node_modules/firebase-tools/lib/responseToError.js:52:12)
+    at RetryOperation._fn (/usr/local/node_packages/node_modules/firebase-tools/lib/apiv2.js:312:77)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+[error] 
+[error] Error: Failed to list Firebase projects. See firebase-debug.log for more info.
+[debug] [2025-07-16T01:39:01.531Z] ----------------------------------------------------------------------
+[debug] [2025-07-16T01:39:01.535Z] Command:       /usr/local/nvm/versions/node/v22.17.0/bin/node /usr/local/node_packages/node_modules/.bin/firebase projects:addfirebase analisis-recibos-energeticos
+[debug] [2025-07-16T01:39:01.536Z] CLI Version:   13.28.0
+[debug] [2025-07-16T01:39:01.537Z] Platform:      linux
+[debug] [2025-07-16T01:39:01.537Z] Node Version:  v22.17.0
+[debug] [2025-07-16T01:39:01.537Z] Time:          Wed Jul 16 2025 01:39:01 GMT+0000 (Coordinated Universal Time)
+[debug] [2025-07-16T01:39:01.537Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2025-07-16T01:39:01.545Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2025-07-16T01:39:01.546Z] > authorizing via signed-in user (davide.t@terrazasdelcaribe.com)
+[debug] [2025-07-16T01:39:01.555Z] Checked if tokens are valid: true, expires at: 1752633389256
+[debug] [2025-07-16T01:39:01.555Z] Checked if tokens are valid: true, expires at: 1752633389256
+[debug] [2025-07-16T01:39:01.557Z] >>> [apiv2][query] POST https://firebase.googleapis.com/v1beta1/projects/analisis-recibos-energeticos:addFirebase [none]
+[debug] [2025-07-16T01:39:01.815Z] <<< [apiv2][status] POST https://firebase.googleapis.com/v1beta1/projects/analisis-recibos-energeticos:addFirebase 403
+[debug] [2025-07-16T01:39:01.815Z] <<< [apiv2][body] POST https://firebase.googleapis.com/v1beta1/projects/analisis-recibos-energeticos:addFirebase {"error":{"code":403,"message":"Firebase Management API has not been used in project analisis-recibos-energeticos before or it is disabled. Enable it by visiting https://console.developers.google.com/apis/api/firebase.googleapis.com/overview?project=analisis-recibos-energeticos then retry. If you enabled this API recently, wait a few minutes for the action to propagate to our systems and retry.","status":"PERMISSION_DENIED","details":[{"@type":"type.googleapis.com/google.rpc.ErrorInfo","reason":"SERVICE_DISABLED","domain":"googleapis.com","metadata":{"containerInfo":"analisis-recibos-energeticos","serviceTitle":"Firebase Management API","consumer":"projects/analisis-recibos-energeticos","activationUrl":"https://console.developers.google.com/apis/api/firebase.googleapis.com/overview?project=analisis-recibos-energeticos","service":"firebase.googleapis.com"}},{"@type":"type.googleapis.com/google.rpc.LocalizedMessage","locale":"en-US","message":"Firebase Management API has not been used in project analisis-recibos-energeticos before or it is disabled. Enable it by visiting https://console.developers.google.com/apis/api/firebase.googleapis.com/overview?project=analisis-recibos-energeticos then retry. If you enabled this API recently, wait a few minutes for the action to propagate to our systems and retry."},{"@type":"type.googleapis.com/google.rpc.Help","links":[{"description":"Google developers console API activation","url":"https://console.developers.google.com/apis/api/firebase.googleapis.com/overview?project=analisis-recibos-energeticos"}]}]}}
+[debug] [2025-07-16T01:39:01.817Z] Request to https://firebase.googleapis.com/v1beta1/projects/analisis-recibos-energeticos:addFirebase had HTTP Error: 403, Firebase Management API has not been used in project analisis-recibos-energeticos before or it is disabled. Enable it by visiting https://console.developers.google.com/apis/api/firebase.googleapis.com/overview?project=analisis-recibos-energeticos then retry. If you enabled this API recently, wait a few minutes for the action to propagate to our systems and retry.
+[debug] [2025-07-16T01:39:01.848Z] FirebaseError: Request to https://firebase.googleapis.com/v1beta1/projects/analisis-recibos-energeticos:addFirebase had HTTP Error: 403, Firebase Management API has not been used in project analisis-recibos-energeticos before or it is disabled. Enable it by visiting https://console.developers.google.com/apis/api/firebase.googleapis.com/overview?project=analisis-recibos-energeticos then retry. If you enabled this API recently, wait a few minutes for the action to propagate to our systems and retry.
+    at responseToError (/usr/local/node_packages/node_modules/firebase-tools/lib/responseToError.js:52:12)
+    at RetryOperation._fn (/usr/local/node_packages/node_modules/firebase-tools/lib/apiv2.js:312:77)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+[error] 
+[error] Error: Failed to add Firebase to Google Cloud Platform project. See firebase-debug.log for more info.
+[debug] [2025-07-16T01:40:58.295Z] ----------------------------------------------------------------------
+[debug] [2025-07-16T01:40:58.297Z] Command:       /usr/local/nvm/versions/node/v22.17.0/bin/node /usr/local/node_packages/node_modules/.bin/firebase projects:addfirebase analisis-recibos-energeticos
+[debug] [2025-07-16T01:40:58.298Z] CLI Version:   13.28.0
+[debug] [2025-07-16T01:40:58.298Z] Platform:      linux
+[debug] [2025-07-16T01:40:58.299Z] Node Version:  v22.17.0
+[debug] [2025-07-16T01:40:58.299Z] Time:          Wed Jul 16 2025 01:40:58 GMT+0000 (Coordinated Universal Time)
+[debug] [2025-07-16T01:40:58.299Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2025-07-16T01:40:58.306Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2025-07-16T01:40:58.306Z] > authorizing via signed-in user (davide.t@terrazasdelcaribe.com)
+[debug] [2025-07-16T01:40:58.314Z] Checked if tokens are valid: true, expires at: 1752633389256
+[debug] [2025-07-16T01:40:58.314Z] Checked if tokens are valid: true, expires at: 1752633389256
+[debug] [2025-07-16T01:40:58.316Z] >>> [apiv2][query] POST https://firebase.googleapis.com/v1beta1/projects/analisis-recibos-energeticos:addFirebase [none]
+[debug] [2025-07-16T01:40:58.722Z] <<< [apiv2][status] POST https://firebase.googleapis.com/v1beta1/projects/analisis-recibos-energeticos:addFirebase 403
+[debug] [2025-07-16T01:40:58.722Z] <<< [apiv2][body] POST https://firebase.googleapis.com/v1beta1/projects/analisis-recibos-energeticos:addFirebase {"error":{"code":403,"message":"The caller does not have permission","status":"PERMISSION_DENIED"}}
+[debug] [2025-07-16T01:40:58.724Z] Request to https://firebase.googleapis.com/v1beta1/projects/analisis-recibos-energeticos:addFirebase had HTTP Error: 403, The caller does not have permission
+[debug] [2025-07-16T01:40:58.755Z] FirebaseError: Request to https://firebase.googleapis.com/v1beta1/projects/analisis-recibos-energeticos:addFirebase had HTTP Error: 403, The caller does not have permission
+    at responseToError (/usr/local/node_packages/node_modules/firebase-tools/lib/responseToError.js:52:12)
+    at RetryOperation._fn (/usr/local/node_packages/node_modules/firebase-tools/lib/apiv2.js:312:77)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+[error] 
+[error] Error: Failed to add Firebase to Google Cloud Platform project. See firebase-debug.log for more info.
+[debug] [2025-07-16T01:42:00.154Z] ----------------------------------------------------------------------
+[debug] [2025-07-16T01:42:00.157Z] Command:       /usr/local/nvm/versions/node/v22.17.0/bin/node /usr/local/node_packages/node_modules/.bin/firebase projects:addfirebase analisis-recibos-energeticos
+[debug] [2025-07-16T01:42:00.158Z] CLI Version:   13.28.0
+[debug] [2025-07-16T01:42:00.158Z] Platform:      linux
+[debug] [2025-07-16T01:42:00.158Z] Node Version:  v22.17.0
+[debug] [2025-07-16T01:42:00.159Z] Time:          Wed Jul 16 2025 01:42:00 GMT+0000 (Coordinated Universal Time)
+[debug] [2025-07-16T01:42:00.159Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2025-07-16T01:42:00.166Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2025-07-16T01:42:00.167Z] > authorizing via signed-in user (davide.t@terrazasdelcaribe.com)
+[debug] [2025-07-16T01:42:00.175Z] Checked if tokens are valid: true, expires at: 1752633389256
+[debug] [2025-07-16T01:42:00.176Z] Checked if tokens are valid: true, expires at: 1752633389256
+[debug] [2025-07-16T01:42:00.177Z] >>> [apiv2][query] POST https://firebase.googleapis.com/v1beta1/projects/analisis-recibos-energeticos:addFirebase [none]
+[debug] [2025-07-16T01:42:00.576Z] <<< [apiv2][status] POST https://firebase.googleapis.com/v1beta1/projects/analisis-recibos-energeticos:addFirebase 403
+[debug] [2025-07-16T01:42:00.577Z] <<< [apiv2][body] POST https://firebase.googleapis.com/v1beta1/projects/analisis-recibos-energeticos:addFirebase {"error":{"code":403,"message":"The caller does not have permission","status":"PERMISSION_DENIED"}}
+[debug] [2025-07-16T01:42:00.578Z] Request to https://firebase.googleapis.com/v1beta1/projects/analisis-recibos-energeticos:addFirebase had HTTP Error: 403, The caller does not have permission
+[debug] [2025-07-16T01:42:00.617Z] FirebaseError: Request to https://firebase.googleapis.com/v1beta1/projects/analisis-recibos-energeticos:addFirebase had HTTP Error: 403, The caller does not have permission
+    at responseToError (/usr/local/node_packages/node_modules/firebase-tools/lib/responseToError.js:52:12)
+    at RetryOperation._fn (/usr/local/node_packages/node_modules/firebase-tools/lib/apiv2.js:312:77)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+[error] 
+[error] Error: Failed to add Firebase to Google Cloud Platform project. See firebase-debug.log for more info.
