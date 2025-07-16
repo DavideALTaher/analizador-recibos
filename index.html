@@ -1,13 +1,33 @@
+// Archivo: index.html
+// Este es el archivo principal para la aplicación de análisis de recibos con drag & drop
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Analizador de Recibos Eléctricos</title>
+    <!-- Tailwind CSS vía CDN para simplicidad de instalación -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Dropzone.js para drag & drop -->
     <script src="https://unpkg.com/dropzone@5/dist/min/dropzone.min.js"></script>
     <link rel="stylesheet" href="https://unpkg.com/dropzone@5/dist/min/dropzone.min.css" type="text/css" />
+    <!-- Chart.js para gráficos -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .dropzone {
+            border: 2px dashed #3b82f6;
+            border-radius: 5px;
+            background: #f0f9ff;
+        }
+        .dropzone .dz-message {
+            color: #3b82f6;
+            font-weight: 500;
+        }
+        .hidden {
+            display: none;
+        }
+    </style>
 </head>
 <body class="bg-gray-50 min-h-screen">
     <div class="container mx-auto px-4 py-8">
@@ -21,11 +41,81 @@
             
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                    <div id="dropzone" class="dropzone h-60 flex items-center justify-center border-2 border-dashed border-blue-500 rounded-lg bg-blue-50">
-                        <div class="dz-message text-center">
-                            <div class="text-lg mb-2 text-blue-600">Arrastre sus recibos eléctricos aquí</div>
+                    <form id="upload-form" class="dropzone h-60 flex items-center justify-center">
+                        <div class="dz-message">
+                            <div class="text-lg mb-2">Arrastre sus recibos eléctricos aquí</div>
                             <div class="text-sm text-gray-500">O haga clic para seleccionar archivos</div>
                         </div>
+                    </form>
+                    <div class="mt-4 text-sm text-gray-500">
+                        <p>Formatos aceptados: JPG, PNG, PDF</p>
+                        <p>Se recomienda subir de 3 a 6 recibos recientes</p>
+                    </div>
+                </div>
+                
+                <div>
+                    <h3 class="font-medium mb-3">Recibos Cargados</h3>
+                    <div id="receipt-list" class="space-y-2 mb-4">
+                        <div class="text-gray-500 italic">No hay recibos cargados</div>
+                    </div>
+                    
+                    <div id="manual-data-entry" class="mt-4">
+                        <div class="flex items-center mb-3">
+                            <div class="h-px flex-grow bg-gray-200"></div>
+                            <p class="mx-2 text-gray-500 text-sm">o</p>
+                            <div class="h-px flex-grow bg-gray-200"></div>
+                        </div>
+                        
+                        <button id="show-manual-btn" class="w-full py-2 px-4 border border-blue-300 text-blue-600 rounded hover:bg-blue-50">
+                            Ingresar datos manualmente
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="manual-entry-form" class="hidden mt-8 border-t pt-6">
+                <h3 class="font-medium mb-4">Ingreso Manual de Datos</h3>
+                
+                <div id="manual-receipts">
+                    <div class="receipt-entry mb-4 p-4 border border-gray-200 rounded-lg">
+                        <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Mes</label>
+                                <input type="month" class="receipt-month w-full p-2 border border-gray-300 rounded">
+                            </div>
+                            
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Consumo (kWh)</label>
+                                <input type="number" class="receipt-consumption w-full p-2 border border-gray-300 rounded" placeholder="Ej. 3000">
+                            </div>
+                            
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Demanda (kW)</label>
+                                <input type="number" class="receipt-demand w-full p-2 border border-gray-300 rounded" placeholder="Ej. 15">
+                            </div>
+                            
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Factor de Potencia</label>
+                                <input type="number" step="0.01" min="0" max="1" class="receipt-factor w-full p-2 border border-gray-300 rounded" placeholder="Ej. 0.85">
+                            </div>
+                            
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Monto Total (₡)</label>
+                                <input type="number" class="receipt-amount w-full p-2 border border-gray-300 rounded" placeholder="Ej. 150000" required>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="flex justify-between mt-4">
+                    <button id="add-receipt-btn" class="py-1 px-3 bg-green-100 text-green-700 rounded-md hover:bg-green-200">
+                        + Agregar Otro Recibo
+                    </button>
+                    
+                    <div>
+                        <button id="clear-manual-btn" class="py-1 px-3 mr-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200">
+                            Cancelar
+                        </button>
                     </div>
                 </div>
             </div>
@@ -36,12 +126,716 @@
                 </button>
             </div>
         </div>
+        
+        <div id="results-section" class="hidden">
+            <!-- Los resultados del análisis se mostrarán aquí -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <div class="bg-white rounded-lg shadow-lg p-6">
+                    <h2 class="text-xl font-bold mb-4 text-blue-800">Resumen de Consumo</h2>
+                    
+                    <div class="space-y-4">
+                        <div class="flex justify-between border-b pb-2">
+                            <span class="font-medium">Consumo Promedio:</span>
+                            <span id="avg-consumption">0 kWh</span>
+                        </div>
+                        
+                        <div class="flex justify-between border-b pb-2">
+                            <span class="font-medium">Demanda Promedio:</span>
+                            <span id="avg-demand">0 kW</span>
+                        </div>
+                        
+                        <div class="flex justify-between border-b pb-2">
+                            <span class="font-medium">Factor de Potencia Promedio:</span>
+                            <span id="avg-factor">0</span>
+                        </div>
+                        
+                        <div class="flex justify-between border-b pb-2">
+                            <span class="font-medium">Factura Promedio:</span>
+                            <span id="avg-amount" class="font-bold">₡0</span>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-6">
+                        <h3 class="text-lg font-bold mb-2 text-blue-800">Equipo Recomendado</h3>
+                        <div class="bg-blue-50 p-4 rounded-lg border border-blue-200">
+                            <div id="recommended-model" class="text-2xl font-bold text-center mb-2 text-blue-800">-</div>
+                            <div id="model-description" class="text-center mb-4 text-gray-600">-</div>
+                            
+                            <div class="grid grid-cols-2 gap-2 text-sm">
+                                <div class="flex justify-between">
+                                    <span class="font-medium">Precio:</span>
+                                    <span id="model-price">₡0</span>
+                                </div>
+                                
+                                <div class="flex justify-between">
+                                    <span class="font-medium">Prima Inicial:</span>
+                                    <span id="model-downpayment">₡0</span>
+                                </div>
+                                
+                                <div class="flex justify-between">
+                                    <span class="font-medium">Cuota Mensual:</span>
+                                    <span id="model-monthly">₡0</span>
+                                </div>
+                                
+                                <div class="flex justify-between">
+                                    <span class="font-medium">Plazo:</span>
+                                    <span>24 meses</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-6">
+                        <h3 class="text-lg font-bold mb-2 text-blue-800">Tendencia de Consumo</h3>
+                        <div class="h-64">
+                            <canvas id="consumption-chart"></canvas>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-white rounded-lg shadow-lg p-6">
+                    <h2 class="text-xl font-bold mb-4 text-green-700">Análisis Financiero</h2>
+                    
+                    <div class="space-y-6">
+                        <div>
+                            <h3 class="font-bold text-lg mb-2">Ahorros Mensuales</h3>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div class="bg-green-50 p-3 rounded-lg border border-green-200">
+                                    <div class="text-sm text-green-800 mb-1">Ahorro Estimado Mensual</div>
+                                    <div id="monthly-savings" class="text-2xl font-bold text-green-700">₡0</div>
+                                </div>
+                                
+                                <div id="flow-container" class="bg-green-50 p-3 rounded-lg border border-green-200">
+                                    <div id="flow-label" class="text-sm text-green-800 mb-1">Flujo Mensual Durante Financiamiento</div>
+                                    <div id="net-flow" class="text-2xl font-bold text-green-700">₡0</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="border-t pt-4">
+                            <h3 class="font-bold text-lg mb-2">Retorno de Inversión</h3>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div class="bg-blue-50 p-3 rounded-lg border border-blue-200">
+                                    <div class="text-sm text-blue-800 mb-1">Tiempo de Recuperación</div>
+                                    <div id="roi-time" class="text-2xl font-bold text-blue-700">0 meses</div>
+                                </div>
+                                
+                                <div class="bg-purple-50 p-3 rounded-lg border border-purple-200">
+                                    <div class="text-sm text-purple-800 mb-1">Ahorro al Finalizar Financiamiento</div>
+                                    <div id="savings-after-financing" class="text-2xl font-bold text-purple-700">₡0</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="border-t pt-4">
+                            <h3 class="font-bold text-lg mb-2">Proyección a Largo Plazo</h3>
+                            <div class="bg-indigo-50 p-4 rounded-lg border border-indigo-200">
+                                <div class="text-sm text-indigo-800 mb-1">Ahorro Total en 5 Años</div>
+                                <div id="savings-5-years" class="text-3xl font-bold text-indigo-700">₡0</div>
+                                <div class="text-xs text-gray-500 mt-1">Después de recuperar la inversión inicial y finalizar el financiamiento</div>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-6">
+                            <h3 class="text-lg font-bold mb-2 text-blue-800">Proyección de Ahorro</h3>
+                            <div class="h-64">
+                                <canvas id="savings-chart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-span-1 lg:col-span-2">
+                    <div class="bg-white rounded-lg shadow-lg p-6">
+                        <h2 class="text-xl font-bold mb-4 text-gray-800">Comparativa de Flujo de Caja</h2>
+                        
+                        <div class="overflow-x-auto">
+                            <table id="cash-flow-table" class="min-w-full divide-y divide-gray-200">
+                                <thead>
+                                    <tr>
+                                        <th class="px-4 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Período</th>
+                                        <th class="px-4 py-3 bg-gray-50 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Sin Equipo</th>
+                                        <th class="px-4 py-3 bg-gray-50 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Con Equipo (durante financiamiento)</th>
+                                        <th class="px-4 py-3 bg-gray-50 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Con Equipo (después de financiamiento)</th>
+                                        <th class="px-4 py-3 bg-gray-50 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Ahorro Acumulado</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="bg-white divide-y divide-gray-200">
+                                    <!-- La tabla de flujo de caja se generará dinámicamente aquí -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-span-1 lg:col-span-2 text-center mt-6">
+                    <button id="back-btn" class="bg-gray-600 hover:bg-gray-700 text-white py-2 px-6 rounded">
+                        Volver a Ingresar Datos
+                    </button>
+                    
+                    <button id="export-pdf-btn" class="bg-green-600 hover:bg-green-700 text-white py-2 px-6 rounded ml-4">
+                        Exportar a PDF
+                    </button>
+                </div>
+            </div>
+        </div>
     </div>
 
+    <!-- Script para la aplicación -->
     <script>
-        document.getElementById('analyze-btn').addEventListener('click', function() {
-            alert('Función de análisis simulada. En una implementación real, se procesarían los recibos.');
+        // Datos de los modelos de equipos
+        const modelos = [
+            {
+                modelo: 'JS-1299',
+                rango: '200A-450A',
+                aplicacion: 'Residencial/Comercial pequeño',
+                precioFinanciado: 3200000,
+                precioContado: 2800000,
+                instalacion: 500000,
+                primaTotal: 1100000,
+                cuotaMensual: 128375,
+                porcentajeAhorro: 0.15
+            },
+            {
+                modelo: 'JS-1699',
+                rango: '451A-600A',
+                aplicacion: 'Comercial mediano',
+                precioFinanciado: 4000000,
+                precioContado: 3600000,
+                instalacion: 500000,
+                primaTotal: 1300000,
+                cuotaMensual: 157710,
+                porcentajeAhorro: 0.18
+            },
+            {
+                modelo: 'JS-2099',
+                rango: '601A-850A',
+                aplicacion: 'Comercial grande',
+                precioFinanciado: 4600000,
+                precioContado: 4200000,
+                instalacion: 500000,
+                primaTotal: 1500000,
+                cuotaMensual: 177625,
+                porcentajeAhorro: 0.22
+            },
+            {
+                modelo: 'JS-2499',
+                rango: '851A-1200A',
+                aplicacion: 'Industrial',
+                precioFinanciado: 5200000,
+                precioContado: 4800000,
+                instalacion: 550000,
+                primaTotal: 1750000,
+                cuotaMensual: 197810,
+                porcentajeAhorro: 0.25
+            }
+        ];
+
+        // Inicializar Dropzone
+        Dropzone.autoDiscover = false;
+        const myDropzone = new Dropzone("#upload-form", {
+            url: "#", // No hay backend real, procesamos localmente
+            autoProcessQueue: false,
+            maxFiles: 6,
+            acceptedFiles: "image/jpeg,image/png,application/pdf",
+            addRemoveLinks: true,
+            dictRemoveFile: "Eliminar",
+            init: function() {
+                this.on("addedfile", function(file) {
+                    updateReceiptList();
+                });
+                this.on("removedfile", function(file) {
+                    updateReceiptList();
+                });
+            }
         });
+
+        // Función para actualizar la lista de recibos
+        function updateReceiptList() {
+            const receiptList = document.getElementById('receipt-list');
+            const files = myDropzone.files;
+            
+            if (files.length === 0) {
+                receiptList.innerHTML = '<div class="text-gray-500 italic">No hay recibos cargados</div>';
+                return;
+            }
+            
+            receiptList.innerHTML = '';
+            files.forEach((file, index) => {
+                const item = document.createElement('div');
+                item.className = 'flex items-center justify-between py-2 px-3 bg-blue-50 rounded';
+                item.innerHTML = `
+                    <div class="flex items-center">
+                        <span class="text-sm font-medium">${file.name}</span>
+                        <span class="ml-2 text-xs text-gray-500">(${(file.size / 1024).toFixed(1)} KB)</span>
+                    </div>
+                    <button class="text-red-500 hover:text-red-700 text-sm" onclick="myDropzone.removeFile(myDropzone.files[${index}])">
+                        Eliminar
+                    </button>
+                `;
+                receiptList.appendChild(item);
+            });
+        }
+
+        // Eventos para mostrar/ocultar formulario manual
+        document.getElementById('show-manual-btn').addEventListener('click', function() {
+            document.getElementById('manual-entry-form').classList.remove('hidden');
+            this.classList.add('hidden');
+        });
+
+        document.getElementById('clear-manual-btn').addEventListener('click', function() {
+            document.getElementById('manual-entry-form').classList.add('hidden');
+            document.getElementById('show-manual-btn').classList.remove('hidden');
+            // Restablecer el formulario
+            document.getElementById('manual-receipts').innerHTML = `
+                <div class="receipt-entry mb-4 p-4 border border-gray-200 rounded-lg">
+                    <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Mes</label>
+                            <input type="month" class="receipt-month w-full p-2 border border-gray-300 rounded">
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Consumo (kWh)</label>
+                            <input type="number" class="receipt-consumption w-full p-2 border border-gray-300 rounded" placeholder="Ej. 3000">
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Demanda (kW)</label>
+                            <input type="number" class="receipt-demand w-full p-2 border border-gray-300 rounded" placeholder="Ej. 15">
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Factor de Potencia</label>
+                            <input type="number" step="0.01" min="0" max="1" class="receipt-factor w-full p-2 border border-gray-300 rounded" placeholder="Ej. 0.85">
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Monto Total (₡)</label>
+                            <input type="number" class="receipt-amount w-full p-2 border border-gray-300 rounded" placeholder="Ej. 150000" required>
+                        </div>
+                    </div>
+                </div>
+            `;
+        });
+
+        // Agregar recibo al formulario manual
+        document.getElementById('add-receipt-btn').addEventListener('click', function() {
+            const container = document.getElementById('manual-receipts');
+            const newReceipt = document.createElement('div');
+            newReceipt.className = 'receipt-entry mb-4 p-4 border border-gray-200 rounded-lg';
+            newReceipt.innerHTML = `
+                <div class="flex justify-between items-center mb-2">
+                    <div class="text-sm font-medium text-gray-600">Recibo adicional</div>
+                    <button class="text-red-500 hover:text-red-700 text-sm remove-receipt-btn">
+                        Eliminar
+                    </button>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Mes</label>
+                        <input type="month" class="receipt-month w-full p-2 border border-gray-300 rounded">
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Consumo (kWh)</label>
+                        <input type="number" class="receipt-consumption w-full p-2 border border-gray-300 rounded" placeholder="Ej. 3000">
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Demanda (kW)</label>
+                        <input type="number" class="receipt-demand w-full p-2 border border-gray-300 rounded" placeholder="Ej. 15">
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Factor de Potencia</label>
+                        <input type="number" step="0.01" min="0" max="1" class="receipt-factor w-full p-2 border border-gray-300 rounded" placeholder="Ej. 0.85">
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Monto Total (₡)</label>
+                        <input type="number" class="receipt-amount w-full p-2 border border-gray-300 rounded" placeholder="Ej. 150000" required>
+                    </div>
+                </div>
+            `;
+            container.appendChild(newReceipt);
+            
+            // Agregar evento para eliminar el recibo
+            newReceipt.querySelector('.remove-receipt-btn').addEventListener('click', function() {
+                container.removeChild(newReceipt);
+            });
+        });
+
+        // Evento para analizar recibos
+        document.getElementById('analyze-btn').addEventListener('click', function() {
+            // Obtener datos de recibos (combinar datos de archivos y manual)
+            const receipts = getReceiptData();
+            
+            if (receipts.length === 0) {
+                alert('Por favor ingrese datos de al menos un recibo');
+                return;
+            }
+            
+            // Realizar análisis
+            const results = analyzeReceipts(receipts);
+            
+            // Mostrar resultados
+            displayResults(results);
+            
+            // Ocultar sección de carga y mostrar resultados
+            document.getElementById('upload-section').classList.add('hidden');
+            document.getElementById('results-section').classList.remove('hidden');
+        });
+
+        // Evento para volver a la pantalla de carga
+        document.getElementById('back-btn').addEventListener('click', function() {
+            document.getElementById('results-section').classList.add('hidden');
+            document.getElementById('upload-section').classList.remove('hidden');
+        });
+
+        // Evento para exportar a PDF (simulado)
+        document.getElementById('export-pdf-btn').addEventListener('click', function() {
+            alert('Funcionalidad de exportación a PDF simulada. En una implementación real, se generaría un PDF con los resultados del análisis.');
+        });
+
+        // Función para obtener datos de recibos (combina archivos y manual)
+        function getReceiptData() {
+            const receipts = [];
+            
+            // Para esta demo, simulamos datos de recibos basados en los archivos cargados
+            // En una implementación real, se extraerían datos mediante OCR o API
+            const files = myDropzone.files;
+            files.forEach(file => {
+                // Simular datos de consumo basados en el tamaño del archivo
+                // (en una app real, esto sería reemplazado por OCR o procesamiento de datos)
+                const consumo = Math.floor(Math.random() * 5000) + 1000;
+                const demanda = Math.floor(Math.random() * 30) + 5;
+                const factorPotencia = (Math.floor(Math.random() * 20) + 80) / 100;
+                const monto = consumo * 100 + demanda * 2000;
+                
+                receipts.push({
+                    mes: new Date().toISOString().substring(0, 7), // YYYY-MM
+                    consumoKWh: consumo,
+                    demandaKW: demanda,
+                    factorPotencia: factorPotencia,
+                    montoTotal: monto
+                });
+            });
+            
+            // Obtener datos del formulario manual
+            const manualReceipts = document.querySelectorAll('.receipt-entry');
+            manualReceipts.forEach(entry => {
+                const mes = entry.querySelector('.receipt-month').value;
+                const consumo = entry.querySelector('.receipt-consumption').value;
+                const demanda = entry.querySelector('.receipt-demand').value;
+                const factor = entry.querySelector('.receipt-factor').value;
+                const monto = entry.querySelector('.receipt-amount').value;
+                
+                if (monto) { // Al menos el monto es requerido
+                    receipts.push({
+                        mes: mes || new Date().toISOString().substring(0, 7),
+                        consumoKWh: parseFloat(consumo) || 0,
+                        demandaKW: parseFloat(demanda) || 0,
+                        factorPotencia: parseFloat(factor) || 0,
+                        montoTotal: parseFloat(monto)
+                    });
+                }
+            });
+            
+            // Si no hay datos, usar datos de ejemplo
+            if (receipts.length === 0) {
+                const exampleData = [
+                    { mes: '2025-01', consumoKWh: 3017, demandaKW: 8.20, factorPotencia: 0.51, montoTotal: 373225 },
+                    { mes: '2025-02', consumoKWh: 3500, demandaKW: 9.10, factorPotencia: 0.52, montoTotal: 410000 },
+                    { mes: '2025-03', consumoKWh: 3200, demandaKW: 8.50, factorPotencia: 0.50, montoTotal: 385000 }
+                ];
+                return exampleData;
+            }
+            
+            return receipts;
+        }
+
+        // Función para analizar recibos y determinar modelo recomendado
+        function analyzeReceipts(receipts) {
+            // Calcular promedios
+            const promedioConsumo = receipts.reduce((sum, recibo) => sum + Number(recibo.consumoKWh || 0), 0) / receipts.length;
+            const promedioDemanda = receipts.reduce((sum, recibo) => sum + Number(recibo.demandaKW || 0), 0) / receipts.length;
+            const promedioFactorPotencia = receipts.reduce((sum, recibo) => sum + Number(recibo.factorPotencia || 0), 0) / receipts.length;
+            const promedioMonto = receipts.reduce((sum, recibo) => sum + Number(recibo.montoTotal || 0), 0) / receipts.length;
+            
+            // Lógica para seleccionar modelo basado en consumo y demanda
+            let modeloRecomendado;
+            
+            if (promedioDemanda <= 50 && promedioMonto < 500000) {
+                modeloRecomendado = modelos[0]; // JS-1299
+            } else if (promedioDemanda <= 150 && promedioMonto < 1000000) {
+                modeloRecomendado = modelos[1]; // JS-1699
+            } else if (promedioDemanda <= 300 && promedioMonto < 3000000) {
+                modeloRecomendado = modelos[2]; // JS-2099
+            } else {
+                modeloRecomendado = modelos[3]; // JS-2499
+            }
+            
+            // Calcular métricas financieras
+            const ahorroEstimado = promedioMonto * modeloRecomendado.porcentajeAhorro;
+            const ahorroNeto = ahorroEstimado - modeloRecomendado.cuotaMensual;
+            const ahorroTotal24Meses = (ahorroEstimado * 24) - modeloRecomendado.precioFinanciado;
+            
+            let tiempoRecuperacion;
+            if (ahorroNeto <= 0) {
+                tiempoRecuperacion = modeloRecomendado.primaTotal / ahorroEstimado;
+            } else {
+                tiempoRecuperacion = modeloRecomendado.primaTotal / ahorroNeto;
+            }
+            
+            const ahorro5Anos = (ahorroEstimado * 60) - modeloRecomendado.primaTotal - (modeloRecomendado.cuotaMensual * 24);
+            
+            // Generar datos para gráficos
+            const months = receipts.map(r => {
+                const date = r.mes ? new Date(r.mes + '-01') : new Date();
+                return date.toLocaleDateString('es', { month: 'short', year: 'numeric' });
+            }).sort((a, b) => new Date(a) - new Date(b));
+            
+            const consumptionData = receipts.map(r => r.consumoKWh);
+            const amountData = receipts.map(r => r.montoTotal);
+            
+            // Calcular flujo de caja para los próximos 36 meses
+            const cashFlow = [];
+            for (let i = 0; i <= 36; i++) {
+                let sinEquipo, conEquipoFinanciamiento, conEquipoDespues, ahorroMensual, ahorroAcumulado;
+                
+                if (i === 0) {
+                    // Mes 0: Solo prima inicial
+                    sinEquipo = 0;
+                    conEquipoFinanciamiento = modeloRecomendado.primaTotal;
+                    conEquipoDespues = null;
+                    ahorroMensual = -modeloRecomendado.primaTotal;
+                    ahorroAcumulado = -modeloRecomendado.primaTotal;
+                } else {
+                    sinEquipo = promedioMonto;
+                    
+                    if (i <= 24) {
+                        // Durante financiamiento
+                        conEquipoFinanciamiento = promedioMonto - ahorroEstimado + modeloRecomendado.cuotaMensual;
+                        conEquipoDespues = null;
+                        ahorroMensual = ahorroEstimado - modeloRecomendado.cuotaMensual;
+                    } else {
+                        // Después de financiamiento
+                        conEquipoFinanciamiento = null;
+                        conEquipoDespues = promedioMonto - ahorroEstimado;
+                        ahorroMensual = ahorroEstimado;
+                    }
+                    
+                    // Cálculo de ahorro acumulado
+                    if (i === 1) {
+                        ahorroAcumulado = ahorroMensual - modeloRecomendado.primaTotal;
+                    } else if (i <= 24) {
+                        ahorroAcumulado = cashFlow[i-1].ahorroAcumulado + ahorroMensual;
+                    } else {
+                        ahorroAcumulado = cashFlow[i-1].ahorroAcumulado + ahorroMensual;
+                    }
+                }
+                
+                cashFlow.push({
+                    mes: i,
+                    sinEquipo,
+                    conEquipoFinanciamiento,
+                    conEquipoDespues,
+                    ahorroMensual,
+                    ahorroAcumulado
+                });
+            }
+            
+            return {
+                consumoPromedio: promedioConsumo,
+                demandaPromedio: promedioDemanda,
+                factorPotenciaPromedio: promedioFactorPotencia,
+                montoPromedio: promedioMonto,
+                modeloRecomendado: modeloRecomendado.modelo,
+                rango: modeloRecomendado.rango,
+                aplicacion: modeloRecomendado.aplicacion,
+                precioEquipo: modeloRecomendado.precioFinanciado,
+                primaInicial: modeloRecomendado.primaTotal,
+                cuotaMensual: modeloRecomendado.cuotaMensual,
+                ahorroEstimado: ahorroEstimado,
+                ahorroNeto: ahorroNeto,
+                tiempoRecuperacion: tiempoRecuperacion,
+                ahorroTotal24Meses: ahorroTotal24Meses,
+                ahorro5Anos: ahorro5Anos,
+                months: months,
+                consumptionData: consumptionData,
+                amountData: amountData,
+                cashFlow: cashFlow
+            };
+        }
+
+        // Función para mostrar resultados
+        function displayResults(results) {
+            // Formatear números
+            const formatNumber = (num) => new Intl.NumberFormat('es-CR').format(Math.round(num));
+            const formatColones = (num) => '₡' + formatNumber(num);
+            
+            // Actualizar resumen de consumo
+            document.getElementById('avg-consumption').textContent = formatNumber(results.consumoPromedio) + ' kWh';
+            document.getElementById('avg-demand').textContent = results.demandaPromedio.toFixed(2) + ' kW';
+            document.getElementById('avg-factor').textContent = results.factorPotenciaPromedio.toFixed(2);
+            document.getElementById('avg-amount').textContent = formatColones(results.montoPromedio);
+            
+            // Actualizar modelo recomendado
+            document.getElementById('recommended-model').textContent = results.modeloRecomendado;
+            document.getElementById('model-description').textContent = `${results.aplicacion} (${results.rango})`;
+            document.getElementById('model-price').textContent = formatColones(results.precioEquipo);
+            document.getElementById('model-downpayment').textContent = formatColones(results.primaInicial);
+            document.getElementById('model-monthly').textContent = formatColones(results.cuotaMensual);
+            
+            // Actualizar análisis financiero
+            document.getElementById('monthly-savings').textContent = formatColones(results.ahorroEstimado);
+            document.getElementById('net-flow').textContent = formatColones(results.ahorroNeto);
+            
+            // Actualizar estilos según el flujo neto
+            const flowContainer = document.getElementById('flow-container');
+            const flowLabel = document.getElementById('flow-label');
+            const netFlow = document.getElementById('net-flow');
+            
+            if (results.ahorroNeto >= 0) {
+                flowContainer.className = 'bg-green-50 p-3 rounded-lg border border-green-200';
+                flowLabel.className = 'text-sm text-green-800 mb-1';
+                flowLabel.textContent = 'Flujo Positivo Mensual';
+                netFlow.className = 'text-2xl font-bold text-green-700';
+            } else {
+                flowContainer.className = 'bg-yellow-50 p-3 rounded-lg border border-yellow-200';
+                flowLabel.className = 'text-sm text-yellow-800 mb-1';
+                flowLabel.textContent = 'Flujo Mensual Durante Financiamiento';
+                netFlow.className = 'text-2xl font-bold text-yellow-600';
+            }
+            
+            // Actualizar retorno de inversión
+            document.getElementById('roi-time').textContent = 
+                results.tiempoRecuperacion > 0 
+                    ? `${Math.ceil(results.tiempoRecuperacion)} meses` 
+                    : 'Inmediato';
+            document.getElementById('savings-after-financing').textContent = formatColones(results.ahorroTotal24Meses);
+            document.getElementById('savings-5-years').textContent = formatColones(results.ahorro5Anos);
+            
+            // Generar tabla de flujo de caja
+            const tableBody = document.querySelector('#cash-flow-table tbody');
+            tableBody.innerHTML = '';
+            
+            results.cashFlow.forEach((flow, index) => {
+                if (index > 25 && index < 35 && index % 3 !== 0) return; // Mostrar menos filas en el medio
+                
+                const row = document.createElement('tr');
+                const isSpecialRow = index === 0 || index === 24 || index === 36;
+                const isMonthRow = index % 12 === 0;
+                
+                row.className = isSpecialRow ? 'bg-blue-50' : isMonthRow ? 'bg-gray-50' : '';
+                
+                let label = `Mes ${index}`;
+                if (index === 0) label = 'Inversión Inicial';
+                if (index === 24) label += ' (Fin de financiamiento)';
+                if (index === 36) label += ' (3 años)';
+                
+                let sinEquipoText = index === 0 ? '₡0' : formatColones(flow.sinEquipo);
+                let conFinanciamientoText = index === 0 ? `-${formatColones(flow.conEquipoFinanciamiento)}` : 
+                                          index <= 24 ? formatColones(flow.conEquipoFinanciamiento) : 'N/A';
+                let conDespuesText = index > 24 ? formatColones(flow.conEquipoDespues) : 'N/A';
+                let ahorroText = flow.ahorroAcumulado >= 0 
+                                ? formatColones(flow.ahorroAcumulado) 
+                                : `-${formatColones(Math.abs(flow.ahorroAcumulado))}`;
+                
+                row.innerHTML = `
+                    <td class="px-4 py-3 ${isSpecialRow ? 'font-bold' : ''}">${label}</td>
+                    <td class="px-4 py-3 text-right">${sinEquipoText}</td>
+                    <td class="px-4 py-3 text-right">${conFinanciamientoText}</td>
+                    <td class="px-4 py-3 text-right">${conDespuesText}</td>
+                    <td class="px-4 py-3 text-right ${flow.ahorroAcumulado >= 0 ? 'text-green-600' : 'text-red-600'} ${isSpecialRow ? 'font-bold' : ''}">${ahorroText}</td>
+                `;
+                
+                tableBody.appendChild(row);
+            });
+            
+            // Generar gráfico de consumo
+            const consumptionCtx = document.getElementById('consumption-chart').getContext('2d');
+            new Chart(consumptionCtx, {
+                type: 'bar',
+                data: {
+                    labels: results.months,
+                    datasets: [{
+                        label: 'Consumo (kWh)',
+                        data: results.consumptionData,
+                        backgroundColor: 'rgba(59, 130, 246, 0.5)',
+                        borderColor: 'rgba(59, 130, 246, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'kWh'
+                            }
+                        }
+                    },
+                    responsive: true,
+                    maintainAspectRatio: false
+                }
+            });
+            
+            // Generar gráfico de ahorro
+            const savingsCtx = document.getElementById('savings-chart').getContext('2d');
+            const labels = Array.from({length: 37}, (_, i) => `Mes ${i}`);
+            const ahorroData = results.cashFlow.map(flow => flow.ahorroAcumulado);
+            
+            new Chart(savingsCtx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Ahorro Acumulado',
+                        data: ahorroData,
+                        borderColor: 'rgba(16, 185, 129, 1)',
+                        backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                        borderWidth: 2,
+                        fill: true,
+                        tension: 0.3
+                    }]
+                },
+                options: {
+                    scales: {
+                        y: {
+                            title: {
+                                display: true,
+                                text: 'Colones (₡)'
+                            }
+                        },
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Tiempo'
+                            }
+                        }
+                    },
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        annotation: {
+                            annotations: {
+                                line1: {
+                                    type: 'line',
+                                    yMin: 0,
+                                    yMax: 0,
+                                    borderColor: 'rgb(0, 0, 0)',
+                                    borderWidth: 1,
+                                    borderDash: [5, 5]
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
     </script>
 </body>
 </html>
