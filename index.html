@@ -14,6 +14,12 @@
     <link rel="stylesheet" href="https://unpkg.com/dropzone@5/dist/min/dropzone.min.css" type="text/css" />
     <!-- Chart.js para gráficos -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- jsPDF para exportar a PDF --> 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script> 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script> 
+    
+    <!-- SheetJS para exportar a Excel --> 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <style>
         .dropzone {
             border: 2px dashed #3b82f6;
@@ -493,9 +499,167 @@
             document.getElementById('upload-section').classList.remove('hidden');
         });
 
-        // Evento para exportar a PDF (simulado)
+        // Evento para exportar a PDF
         document.getElementById('export-pdf-btn').addEventListener('click', function() {
-            alert('Funcionalidad de exportación a PDF simulada. En una implementación real, se generaría un PDF con los resultados del análisis.');
+            // Crear nueva instancia de jsPDF
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            
+            // Título
+            doc.setFontSize(18);
+            doc.text('Análisis de Recibos Eléctricos', 105, 15, { align: 'center' });
+            
+            // Información del modelo recomendado
+            doc.setFontSize(14);
+            doc.text('Equipo Recomendado', 15, 25);
+            
+            doc.setFontSize(12);
+            doc.text(`Modelo: ${document.getElementById('recommended-model').textContent}`, 15, 35);
+            doc.text(`Descripción: ${document.getElementById('model-description').textContent}`, 15, 42);
+            doc.text(`Precio: ${document.getElementById('model-price').textContent}`, 15, 49);
+            doc.text(`Prima Inicial: ${document.getElementById('model-downpayment').textContent}`, 15, 56);
+            doc.text(`Cuota Mensual: ${document.getElementById('model-monthly').textContent}`, 15, 63);
+            
+            // Resumen de consumo
+            doc.setFontSize(14);
+            doc.text('Resumen de Consumo', 15, 75);
+            
+            doc.setFontSize(12);
+            doc.text(`Consumo Promedio: ${document.getElementById('avg-consumption').textContent}`, 15, 85);
+            doc.text(`Demanda Promedio: ${document.getElementById('avg-demand').textContent}`, 15, 92);
+            doc.text(`Factor de Potencia Promedio: ${document.getElementById('avg-factor').textContent}`, 15, 99);
+            doc.text(`Factura Promedio: ${document.getElementById('avg-amount').textContent}`, 15, 106);
+            
+            // Análisis financiero
+            doc.setFontSize(14);
+            doc.text('Análisis Financiero', 15, 118);
+            
+            doc.setFontSize(12);
+            doc.text(`Ahorro Estimado Mensual: ${document.getElementById('monthly-savings').textContent}`, 15, 128);
+            doc.text(`Flujo Mensual: ${document.getElementById('net-flow').textContent}`, 15, 135);
+            doc.text(`Tiempo de Recuperación: ${document.getElementById('roi-time').textContent}`, 15, 142);
+            doc.text(`Ahorro al Finalizar Financiamiento: ${document.getElementById('savings-after-financing').textContent}`, 15, 149);
+            doc.text(`Ahorro Total en 5 Años: ${document.getElementById('savings-5-years').textContent}`, 15, 156);
+            
+            // Tabla de flujo de caja (primera página)
+            doc.addPage();
+            doc.setFontSize(14);
+            doc.text('Comparativa de Flujo de Caja', 105, 15, { align: 'center' });
+            
+            // Obtener datos de la tabla
+            const table = document.getElementById('cash-flow-table');
+            const tableData = [];
+            
+            // Encabezados
+            const headerRow = [];
+            const headerCells = table.querySelectorAll('thead th');
+            headerCells.forEach(cell => {
+                headerRow.push(cell.textContent);
+            });
+            tableData.push(headerRow);
+            
+            // Filas de datos
+            const rows = table.querySelectorAll('tbody tr');
+            rows.forEach(row => {
+                const dataRow = [];
+                const cells = row.querySelectorAll('td');
+                cells.forEach(cell => {
+                    dataRow.push(cell.textContent);
+                });
+                tableData.push(dataRow);
+            });
+            
+            // Generar tabla en PDF
+            doc.autoTable({
+                head: [tableData[0]],
+                body: tableData.slice(1, 10), // Primeras 10 filas
+                startY: 25,
+                margin: { top: 20 },
+            });
+            
+            // Agregar pie de página
+            const pageCount = doc.internal.getNumberOfPages();
+            for(let i = 1; i <= pageCount; i++) {
+                doc.setPage(i);
+                doc.setFontSize(10);
+                doc.text(`Página ${i} de ${pageCount}`, 105, doc.internal.pageSize.height - 10, { align: 'center' });
+                doc.text('Análisis generado por Analizador de Recibos Eléctricos', 105, doc.internal.pageSize.height - 5, { align: 'center' });
+            }
+            
+            // Guardar el PDF
+            doc.save('analisis_recibos_electricos.pdf');
+        });
+
+        // Evento para exportar a Excel
+        document.getElementById('export-excel-btn').addEventListener('click', function() {
+            // Crear libro de trabajo Excel
+            const wb = XLSX.utils.book_new();
+            wb.Props = {
+                Title: "Análisis de Recibos Eléctricos",
+                Author: "Analizador de Recibos",
+                CreatedDate: new Date()
+            };
+            
+            // Datos del resumen
+            const resumenData = [
+                ["Análisis de Recibos Eléctricos"],
+                [""],
+                ["RESUMEN DE CONSUMO"],
+                ["Consumo Promedio", document.getElementById('avg-consumption').textContent],
+                ["Demanda Promedio", document.getElementById('avg-demand').textContent],
+                ["Factor de Potencia Promedio", document.getElementById('avg-factor').textContent],
+                ["Factura Promedio", document.getElementById('avg-amount').textContent],
+                [""],
+                ["EQUIPO RECOMENDADO"],
+                ["Modelo", document.getElementById('recommended-model').textContent],
+                ["Descripción", document.getElementById('model-description').textContent],
+                ["Precio", document.getElementById('model-price').textContent],
+                ["Prima Inicial", document.getElementById('model-downpayment').textContent],
+                ["Cuota Mensual", document.getElementById('model-monthly').textContent],
+                [""],
+                ["ANÁLISIS FINANCIERO"],
+                ["Ahorro Estimado Mensual", document.getElementById('monthly-savings').textContent],
+                ["Flujo Mensual", document.getElementById('net-flow').textContent],
+                ["Tiempo de Recuperación", document.getElementById('roi-time').textContent],
+                ["Ahorro al Finalizar Financiamiento", document.getElementById('savings-after-financing').textContent],
+                ["Ahorro Total en 5 Años", document.getElementById('savings-5-years').textContent]
+            ];
+            
+            // Crear hoja para el resumen
+            const wsResumen = XLSX.utils.aoa_to_sheet(resumenData);
+            XLSX.utils.book_append_sheet(wb, wsResumen, "Resumen");
+            
+            // Obtener datos de la tabla de flujo de caja
+            const table = document.getElementById('cash-flow-table');
+            const tableData = [];
+            
+            // Encabezados
+            const headerRow = [];
+            const headerCells = table.querySelectorAll('thead th');
+            headerCells.forEach(cell => {
+                headerRow.push(cell.textContent);
+            });
+            tableData.push(headerRow);
+            
+            // Filas de datos
+            const rows = table.querySelectorAll('tbody tr');
+            rows.forEach(row => {
+                const dataRow = [];
+                const cells = row.querySelectorAll('td');
+                cells.forEach(cell => {
+                    dataRow.push(cell.textContent);
+                });
+                tableData.push(dataRow);
+            });
+            
+            // Crear hoja para el flujo de caja
+            const wsFlujo = XLSX.utils.aoa_to_sheet(tableData);
+            XLSX.utils.book_append_sheet(wb, wsFlujo, "Flujo de Caja");
+            
+            // Guardar el archivo Excel
+            XLSX.writeFile(wb, "analisis_recibos_electricos.xlsx");
+        });
+
         });
 
         // Función para obtener datos de recibos (combina archivos y manual)
