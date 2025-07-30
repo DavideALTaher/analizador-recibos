@@ -12,7 +12,7 @@ const tipoCambioManager = {
             this.tipoCambioActual = parseFloat(guardado);
         }
         
-        const nuevo = "508.81"; // prompt(
+        const nuevo = prompt(
             'Ingrese el tipo de cambio actual del dólar (venta):\n' +
             'Consultar en: https://gee.bccr.fi.cr/indicadoreseconomicos/',
             this.tipoCambioActual
@@ -37,7 +37,7 @@ const tipoCambioManager = {
 
 // Función mejorada de análisis
 window.analyzeReceiptsEnhanced = async function(receipts) {
-    tipoCambioManager.tipoCambioActual = 508.81; // await tipoCambioManager.obtenerTipoCambio();
+    await tipoCambioManager.obtenerTipoCambio();
     
     // Convertir facturas de CRC a USD
     const receiptsUSD = receipts.map(r => ({
