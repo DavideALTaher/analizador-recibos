@@ -1598,14 +1598,13 @@ cat >> index.html.improved << 'EOL'
             console.log('Aplicación inicializada correctamente');
         });
     </script>
-    <script src="auto-limpieza.js"></script>
-    <script src="fix-button.js"></script>
+    <script src="auto-limpieza.js"></script>    <script src="fix-button.js"></script>
     <script src="fix-dragdrop.js"></script>
     <script src="fix-all.js"></script>
     <script src="modelo-negocio.js"></script>
     <script src="fix-pdf-export.js"></script>
     <script src="calculo-mejorado.js"></script>
-    <script src="ui-pagare.js"></script>
+    <script src="override-total.js"></script>    <script src="ui-pagare.js"></script></body>
     <script src="tc-bccr-fijo.js"></script>
     <script src="override-total.js"></script>
     <script src="mejoras-ui-completas.js"></script>
