@@ -12,7 +12,7 @@ const tipoCambioManager = {
             this.tipoCambioActual = parseFloat(guardado);
         }
         
-        const nuevo = "508.81"; "; // prompt comentado
+        const nuevo = "508.81"; // prompt comentado
             'Ingrese el tipo de cambio actual del dólar (venta):\n' +
             'Consultar en: https://gee.bccr.fi.cr/indicadoreseconomicos/',
             this.tipoCambioActual
